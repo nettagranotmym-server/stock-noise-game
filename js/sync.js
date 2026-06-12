@@ -1,97 +1,71 @@
-/* =============================================
-   sync.js — סנכרון בין ADMIN לשחקנים
-               דרך localStorage (ללא שרת)
-   ============================================= */
+const express = require('express');
+const { WebSocketServer } = require('ws');
+const path = require('path');
 
-/* ─────────────────────────────────────────────
-   ADMIN → שחקנים
-   ───────────────────────────────────────────── */
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
-/** ADMIN שולח עדכון שנה חדשה */
-function syncPushToPlayers() {
-  localStorage.setItem('gameState', JSON.stringify({
-    phase:       gamePhase,
-    yearIndex:   currentYearIndex,
-    isTrial,
-    playerData:  players,
-    ts:          Date.now(),
-  }));
-}
+// Serve all static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname)));
 
-/** ADMIN שולח סיום משחק */
-function syncPushEnd() {
-  localStorage.setItem('gameState', JSON.stringify({
-    phase:      'end',
-    yearIndex:  currentYearIndex,
-    isTrial:    false,
-    playerData: players,
-    ts:         Date.now(),
-  }));
-}
+// Start HTTP server
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-/* ─────────────────────────────────────────────
-   שחקן → ADMIN
-   ───────────────────────────────────────────── */
+// ── WebSocket server ──────────────────────────
+const wss = new WebSocketServer({ server });
 
-/** שחקן שולח עדכון תיק (אחרי כל עסקה / סיום) */
-function syncPushPlayerUpdate() {
-  if (!currentPlayer) return;
-  localStorage.setItem('playerUpdate', JSON.stringify({
-    player: players[currentPlayer.id],
-    ts:     Date.now(),
-  }));
-}
+// Keep track of all connected clients
+const clients = new Set();
 
-/* ─────────────────────────────────────────────
-   POLLING — שחקן מאזין לADMIN
-   ───────────────────────────────────────────── */
-setInterval(() => {
-  if (!currentPlayer) return;                     // לא שחקן → מדלג
-  const raw = localStorage.getItem('gameState');
-  if (!raw) return;
+// Last known game state (so late joiners get it immediately)
+let lastGameState   = null;
+let lastPlayerState = {};   // { [playerId]: playerObject }
 
-  let gs;
-  try { gs = JSON.parse(raw); } catch { return; }
+wss.on('connection', (ws) => {
+  clients.add(ws);
+  console.log(`Client connected. Total: ${clients.size}`);
 
-  const onWaiting = document.getElementById('screen-player-waiting')
-    .classList.contains('active');
-  const onLogin   = document.getElementById('screen-player-login')
-    .classList.contains('active');
+  // Send current state to new connection immediately
+  if (lastGameState) {
+    ws.send(JSON.stringify({ type: 'gameState', payload: lastGameState }));
+  }
 
-  /* השחקן מחכה (כבר לחץ "סיימתי") או עדיין בלוגין */
-  if (onWaiting || onLogin) {
-    if (gs.phase === 'end') {
-      // עדכן נתוני שחקן מהאחסון
-      if (gs.playerData && gs.playerData[currentPlayer.id]) {
-        Object.assign(players[currentPlayer.id], gs.playerData[currentPlayer.id]);
-      }
-      showPlayerEnd();
-      return;
+  ws.on('message', (raw) => {
+    let msg;
+    try { msg = JSON.parse(raw); } catch { return; }
+
+    if (msg.type === 'gameState') {
+      // ADMIN broadcasting a new year / end
+      lastGameState = msg.payload;
+      broadcast({ type: 'gameState', payload: msg.payload }, ws);
+
+    } else if (msg.type === 'playerUpdate') {
+      // Player sending their portfolio update
+      const player = msg.payload;
+      lastPlayerState[player.id] = player;
+      broadcast({ type: 'playerUpdate', payload: player }, ws);
     }
+  });
 
-    if (gs.yearIndex !== currentYearIndex) {
-      currentYearIndex = gs.yearIndex;
-      isTrial          = gs.isTrial;
-      // עדכן state שחקנים מה-ADMIN
-      if (gs.playerData) Object.assign(players, gs.playerData);
-      openPlayerGame();
+  ws.on('close', () => {
+    clients.delete(ws);
+    console.log(`Client disconnected. Total: ${clients.size}`);
+  });
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err.message);
+    clients.delete(ws);
+  });
+});
+
+// Broadcast to all clients except the sender
+function broadcast(msg, sender) {
+  const data = JSON.stringify(msg);
+  for (const client of clients) {
+    if (client !== sender && client.readyState === 1) {
+      client.send(data);
     }
   }
-}, 1500);
-
-/* ─────────────────────────────────────────────
-   POLLING — ADMIN מאזין לשחקנים
-   ───────────────────────────────────────────── */
-setInterval(() => {
-  const raw = localStorage.getItem('playerUpdate');
-  if (!raw) return;
-
-  let upd;
-  try { upd = JSON.parse(raw); } catch { return; }
-
-  if (upd && upd.player) {
-    players[upd.player.id] = upd.player;
-    updateAdminGrid();
-    localStorage.removeItem('playerUpdate');
-  }
-}, 800);
+}
