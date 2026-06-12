@@ -511,3 +511,17 @@ input[type=range]::-moz-range-thumb {
 
 /* ── Admin players: remove ready-count, keep underline only ── */
 .ready-count { display: none; }
+
+/* ── 12-month return badge ── */
+.co-data-title-row {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.co-data-name { font-family: 'Rubik', sans-serif; font-size: 14px; font-weight: 700; color: var(--txt); }
+
+.co-return {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 6px; display: inline-block;
+}
+.ret-up   { background: #d1fae5; color: #059669; }
+.ret-down { background: #fee2e2; color: #dc2626; }
+.ret-flat { background: var(--card2); color: var(--txt3); }
