@@ -1,70 +1,80 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>משחק המניות – ADMIN</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>משחק המניות — ADMIN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<div class="bgp"></div>
+<div class="admin-wrap">
 
-<!-- ===== ADMIN SCREEN ===== -->
-<div id="screen-admin" class="screen active">
+  <!-- HEADER -->
   <div class="admin-header">
-    <div class="admin-logo">משחק<span>המניות</span></div>
-    <div id="adminYearBadge" class="admin-year-badge">שלב מבוא</div>
-    <div class="admin-controls">
-      <div id="adminPilot" class="pilot-badge">ניסיון</div>
-      <button class="btn-admin btn-admin-secondary" id="btnAdminStart" onclick="adminStartGame()">▶ התחל משחק</button>
-      <button class="btn-admin btn-admin-primary"   id="btnAdminNext"  onclick="adminNextYear()" disabled>שנה הבאה ←</button>
-      <button class="btn-admin btn-admin-secondary" id="btnAdminEnd"   onclick="adminShowEnd()" style="display:none">📊 סיכום</button>
+    <div class="admin-logo">
+      <span>📈 משחק המניות</span>
+      <span id="pilotBadge" style="display:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:white;margin-right:8px">ניסיון</span>
+    </div>
+    <div class="admin-year-badge" id="yearBadge">שלב מבוא</div>
+    <div class="admin-btns">
+      <button class="abtn abtn-primary"   id="btnStart"  >▶ התחל ניסיון</button>
+      <button class="abtn abtn-primary"   id="btnNext"   disabled>שנה הבאה ←</button>
+      <button class="abtn abtn-secondary" id="btnEnd"    style="display:none">🏁 סיום</button>
+      <button class="abtn abtn-secondary" id="btnRefresh">↺ רענן</button>
+      <button class="abtn abtn-danger"    id="btnReset"  >🗑 איפוס</button>
     </div>
   </div>
 
-  <div class="admin-body">
+  <!-- INTRO VIEW -->
+  <div id="adminIntroView">
+    <div class="admin-companies" id="introCards"></div>
+  </div>
 
-    <!-- INTRO VIEW -->
-    <div class="admin-intro-view" id="adminIntroView">
-      <div class="admin-intro" id="adminIntroCards"></div>
-    </div>
+  <!-- YEAR VIEW -->
+  <div id="adminYearView" style="display:none">
+    <div class="admin-year-cards" id="yearCards"></div>
+  </div>
 
-    <!-- YEAR VIEW -->
-    <div class="admin-year-view" id="adminYearView">
-      <div class="year-companies-row" id="adminYearCards"></div>
-    </div>
-
-    <!-- END VIEW -->
-    <div class="admin-end-view" id="adminEndView">
-      <div class="leaderboard-grid" id="adminLeaderboard"></div>
-      <div class="insight-card insight-card--light">
-        <div class="insight-icon">💡</div>
-        <div class="insight-text insight-text--dark">
-          "חדשות יכולות להפחיד או להלהיב – אבל הן לא תמיד משקפות את איכות העסק.
-          משקיעה טובה לומדת להבדיל בין רעש לבין שינוי אמיתי."
-        </div>
+  <!-- END VIEW -->
+  <div id="adminEndView" style="display:none">
+    <div class="leaderboard" id="leaderboard"></div>
+    <div class="insight-card" style="margin-bottom:20px">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text">
+        "חדשות יכולות להפחיד או להלהיב – אבל הן לא תמיד משקפות את איכות העסק.
+        משקיעה טובה לומדת להבדיל בין רעש לבין שינוי אמיתי."
       </div>
     </div>
-
-    <!-- PLAYERS SECTION -->
-    <div class="players-section" id="playersSection">
-      <div class="players-section-title">שחקנים מחוברים</div>
-      <div class="players-grid-admin" id="adminPlayersGrid"></div>
-      <div class="ready-count" id="readyCount">0 / 0 מוכנים</div>
-    </div>
-
   </div>
+
+  <!-- PLAYERS -->
+  <div class="admin-players-section" id="playersSection">
+    <div class="section-title">שחקנים מחוברים</div>
+    <div class="players-grid" id="playersGrid">
+      <!-- tiles built by JS -->
+    </div>
+    <div class="ready-count" id="readyCount">0 / 0 סיימו לסחור</div>
+  </div>
+
 </div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <script src="js/data.js"></script>
-<script src="js/state.js"></script>
-<script src="js/utils.js"></script>
 <script src="js/admin.js"></script>
-<script src="js/sync.js"></script>
-<script src="js/app.js"></script>
+<script>
+  // Build player tiles on load
+  (function() {
+    const grid = document.getElementById("playersGrid");
+    for (let i = 1; i <= MAX_PLAYERS; i++) {
+      grid.innerHTML += `
+        <div class="p-tile empty" id="ptile-${i}">
+          <div class="p-emoji">○</div>
+          <div class="p-num">${i}</div>
+          <div class="p-val"></div>
+          <div class="waiting-bar"></div>
+        </div>`;
+    }
+  })();
+</script>
 </body>
 </html>

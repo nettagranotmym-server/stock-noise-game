@@ -1,111 +1,67 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>משחק המניות</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>משחק המניות</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<div class="bgp"></div>
+<div class="ct">
 
-<!-- ===== PLAYER LOGIN ===== -->
-<div id="screen-player-login" class="screen active">
-  <div class="login-box">
-    <div class="login-title">משחק<span style="color:var(--pink-hot)">המניות</span> 📈</div>
-    <div class="login-subtitle">בחר/י את מספרך</div>
-    <div class="player-grid" id="playerGrid"></div>
-    <button class="btn-primary" id="joinBtn" disabled onclick="joinGame()">כניסה למשחק ✨</button>
+  <!-- LOGIN -->
+  <div class="sc ws on" id="scrLogin">
+    <div class="wt">משחק המניות 📈</div>
+    <div class="tsa">
+      <div class="tsl">בחר/י את המספר שלך:</div>
+      <div class="tg" id="playerGrid"></div>
+      <button class="sbtn" id="startBtn">כניסה למשחק ➡️</button>
+    </div>
+    <div class="brand-footer">אפליקציה מבית <span>SHEvyon</span></div>
   </div>
-</div>
 
-<!-- ===== PLAYER GAME SCREEN ===== -->
-<div id="screen-player-game" class="screen">
-  <div class="player-header">
-    <div class="player-avatar-name">
-      <div class="player-avatar-big" id="phAvatar"></div>
-      <div>
-        <div class="player-name-header" id="phName"></div>
-        <div class="player-year-label" id="phYear"></div>
+  <!-- GAME -->
+  <div class="sc" id="scrGame">
+    <div class="gh">
+      <div class="gtn" id="gTeam"></div>
+      <div class="gbal">
+        <div class="gbs">שווי תיק</div>
+        <div class="gbv" id="gBal">₪10,000</div>
       </div>
     </div>
-    <div class="player-portfolio-value">
-      <div class="portfolio-label">שווי תיק</div>
-      <div class="portfolio-amount" id="phPortfolio">₪10,000</div>
+    <div id="gContent"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="sc rs" id="scrResults">
+    <div class="rh">
+      <div style="font-size:48px" id="rTrophy">🏆</div>
+      <div class="rtt">המשחק הסתיים!</div>
+      <div class="rts" id="rTeam"></div>
     </div>
-  </div>
-
-  <div class="player-body" id="playerBody"></div>
-
-  <div class="done-section">
-    <button class="btn-done" id="btnDone" onclick="playerDone()">סיימתי לסחור – מחכה לשנה הבאה ✓</button>
-  </div>
-</div>
-
-<!-- ===== WAITING SCREEN ===== -->
-<div id="screen-player-waiting" class="screen">
-  <div class="waiting-avatar" id="waitingAvatar">😊</div>
-  <div class="waiting-title">מחכה לשנה הבאה...</div>
-  <div class="waiting-sub" id="waitingSub">ה-ADMIN יפתח את השנה הבאה בקרוב</div>
-  <div class="portfolio-summary-waiting" id="waitingSummary"></div>
-</div>
-
-<!-- ===== PLAYER END SCREEN ===== -->
-<div id="screen-player-end" class="screen">
-  <div class="end-header">
-    <div class="end-trophy" id="endTrophy">🏆</div>
-    <div class="end-title">המשחק הסתיים!</div>
-    <div class="end-player-name" id="endPlayerName"></div>
-  </div>
-  <div class="end-body" id="endBody"></div>
-</div>
-
-<!-- TRADE MODAL -->
-<div class="modal-overlay" id="tradeModal">
-  <div class="trade-modal">
-    <div class="modal-title" id="modalTitle">קנייה</div>
-    <div class="modal-subtitle" id="modalSubtitle"></div>
-    <div class="modal-price-row">
-      <span class="modal-price-row__label">מחיר למניה</span>
-      <span class="modal-price-row__value" id="modalPriceLabel"></span>
+    <div class="fc">
+      <div class="fl">שווי תיק סופי</div>
+      <div class="fa" id="rAmount"></div>
+      <div class="fr" id="rReturn"></div>
     </div>
-    <div class="modal-qty-row">
-      <span class="modal-qty-label">כמות</span>
-      <div class="modal-qty-ctrl">
-        <button class="modal-qty-btn" onclick="changeModalQty(-1)">−</button>
-        <div class="modal-qty-num" id="modalQtyNum">1</div>
-        <button class="modal-qty-btn" onclick="changeModalQty(1)">+</button>
+    <div class="det" id="rDetails"></div>
+    <div class="insight-card">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text">
+        חדשות יכולות להפחיד או להלהיב – אבל הן לא תמיד משקפות את איכות העסק.
+        משקיעה טובה לומדת להבדיל בין רעש לבין שינוי אמיתי.
       </div>
     </div>
-    <div class="modal-avail-row">
-      <span id="modalAvailLabel"></span>
+    <div style="text-align:center;margin-top:8px">
+      <button class="rbtn" id="restartBtn">שחק/י שוב 🔄</button>
     </div>
-    <div class="modal-cost-row">
-      <span class="modal-cost-label" id="modalCostLabel">עלות כוללת</span>
-      <span class="modal-cost-value" id="modalCostValue">₪0</span>
-    </div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeModal()">ביטול</button>
-      <button class="modal-confirm" id="modalConfirmBtn" onclick="confirmTrade()">אשר/י</button>
-    </div>
+    <div class="brand-footer">אפליקציה מבית <span>SHEvyon</span></div>
   </div>
+
 </div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <script src="js/data.js"></script>
-<script src="js/state.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/player.js"></script>
-<script src="js/modal.js"></script>
-<script src="js/sync.js"></script>
 <script src="js/app.js"></script>
-<script>
-  // On player page, go straight to login
-  goPlayerLogin();
-</script>
 </body>
 </html>

@@ -1,102 +1,129 @@
-/* =============================================
-   data.js — כל נתוני המשחק הקבועים
-   ============================================= */
+// =============================================
+// data.js — כל נתוני המשחק
+// =============================================
 
-const MAX_PLAYERS = 20;
 const STARTING_CASH = 10000;
+const MAX_PLAYERS   = 20;
+const API_BASE      = "";   // same-origin
 
-/* ── Company profiles ── */
+// ── Player emojis (auto-assigned by number) ──
+const PLAYER_EMOJIS = [
+  "😊","😎","🤩","🧐","😄","🥳","🤓","😏","🙂","😁",
+  "😀","🤗","😌","😇","🥸","😉","😋","🤔","😃","😆"
+];
+
+// ── Companies ────────────────────────────────
 const COMPANIES = [
   {
-    id:        'nova',
-    name:      'NovaTech',
-    tag:       'חברת צמיחה',
-    tagClass:  'tag-nova',
-    cardClass: 'nova',
-    moat:      3,
-    mgmt:      3,
-    debt:      1,
-    story:     'החברה משקיעה הרבה בפיתוח מוצרים חדשים. כרגע הרווחיות נמוכה, אך יש לה טכנולוגיה ייחודית שקשה למתחרים להעתיק.',
+    id: "nova", name: "NovaTech", icon: "🚀",
+    tag: "חברת צמיחה", tagClass: "tag-nova", cardClass: "nova",
+    color: "var(--accent)", bg: "rgba(124,58,237,.15)",
+    moat: 3, mgmt: 3, debt: 1,
+    story: "החברה משקיעה הרבה בפיתוח מוצרים חדשים. כרגע הרווחיות נמוכה, אך יש לה טכנולוגיה ייחודית שקשה למתחרים להעתיק.",
     startPrice: 500,
   },
   {
-    id:        'prime',
-    name:      'Prime Holdings',
-    tag:       'חברה יציבה',
-    tagClass:  'tag-prime',
-    cardClass: 'prime',
-    moat:      2,
-    mgmt:      3,
-    debt:      3,
-    story:     'חברה ותיקה ומבוססת. לא צפויה לצמוח במהירות, אך מייצרת הכנסות ורווחים בצורה עקבית.',
+    id: "prime", name: "Prime Holdings", icon: "🏦",
+    tag: "חברה יציבה", tagClass: "tag-prime", cardClass: "prime",
+    color: "var(--green)", bg: "rgba(5,150,105,.15)",
+    moat: 2, mgmt: 3, debt: 3,
+    story: "חברה ותיקה ומבוססת. לא צפויה לצמוח במהירות, אך מייצרת הכנסות ורווחים בצורה עקבית.",
     startPrice: 3000,
   },
   {
-    id:        'fast',
-    name:      'FastWave',
-    tag:       'חברה מבטיחה',
-    tagClass:  'tag-fast',
-    cardClass: 'fast',
-    moat:      2,
-    mgmt:      2,
-    debt:      3,
-    story:     'החברה מציגה תוצאות חזקות וצומחת מהר, אך פועלת בתחום שבו התחרות הולכת וגוברת.',
+    id: "fast", name: "FastWave", icon: "⚡",
+    tag: "חברה מבטיחה", tagClass: "tag-fast", cardClass: "fast",
+    color: "var(--pink)", bg: "rgba(192,38,211,.15)",
+    moat: 2, mgmt: 2, debt: 3,
+    story: "החברה מציגה תוצאות חזקות וצומחת מהר, אך פועלת בתחום שבו התחרות הולכת וגוברת.",
     startPrice: 800,
   },
 ];
 
-/* ── Years data ──
-   prices scaled to match new startPrice values
-   NovaTech:     500  → x10 from original 50
-   Prime:        3000 → x3.33 from original 900
-   FastWave:     800  → x10 from original 80
-   ── */
-const YEARS_DATA = [
-  /* ── שנת ניסיון ── */
+// ── Years ─────────────────────────────────────
+// index 0 = trial, 1-5 = real game
+// returns = price change ratio vs previous year
+const YEARS = [
+  // Trial
   {
-    label: 'שנת ניסיון',
-    nova:  { rev: '₪500M',  profit: '₪-20M', profitClass: 'negative', news: 'החברה מגדילה השקעות בפיתוח – המשקיעים חוששים מהרווחיות הנמוכה.', price: 500 },
-    prime: { rev: '₪900M',  profit: '₪120M', profitClass: 'positive', news: 'החברה ממשיכה להציג יציבות ורווחיות גבוהה.', price: 3000 },
-    fast:  { rev: '₪700M',  profit: '₪90M',  profitClass: 'positive', news: 'FastWave מכה את התחזיות והמניה מושכת עניין רב.', price: 800 },
+    label: "שנת ניסיון", isTrial: true,
+    nova:  { rev: "₪500M", profit: "₪-20M", profitClass: "neg", news: "החברה מגדילה השקעות בפיתוח – המשקיעים חוששים מהרווחיות הנמוכה.", price: 500 },
+    prime: { rev: "₪900M", profit: "₪120M", profitClass: "pos", news: "החברה ממשיכה להציג יציבות ורווחיות גבוהה.", price: 3000 },
+    fast:  { rev: "₪700M", profit: "₪90M",  profitClass: "pos", news: "FastWave מכה את התחזיות והמניה מושכת עניין רב.", price: 800 },
   },
-
-  /* ── שנה 1 ── */
+  // Year 1
   {
-    label: 'שנה 1 מתוך 5',
-    nova:  { rev: '₪620M',  profit: '₪-10M', profitClass: 'negative', news: 'כותרות שליליות: החברה עדיין לא מצליחה להציג רווח משמעותי.', price: 480 },
-    prime: { rev: '₪950M',  profit: '₪130M', profitClass: 'positive', news: 'החברה מעלה תחזית שנתית ומחלקת דיבידנד.', price: 3300 },
-    fast:  { rev: '₪880M',  profit: '₪130M', profitClass: 'positive', news: 'אנליסטים מעלים המלצות בעקבות צמיחה מהירה.', price: 960 },
+    label: "שנה 1 מתוך 5", isTrial: false,
+    nova:  { rev: "₪620M",  profit: "₪-10M", profitClass: "neg", news: "כותרות שליליות: החברה עדיין לא מצליחה להציג רווח משמעותי.", price: 480 },
+    prime: { rev: "₪950M",  profit: "₪130M", profitClass: "pos", news: "החברה מעלה תחזית שנתית ומחלקת דיבידנד.", price: 3300 },
+    fast:  { rev: "₪880M",  profit: "₪130M", profitClass: "pos", news: "אנליסטים מעלים המלצות בעקבות צמיחה מהירה.", price: 960 },
   },
-
-  /* ── שנה 2 ── */
+  // Year 2
   {
-    label: 'שנה 2 מתוך 5',
-    nova:  { rev: '₪760M',  profit: '₪5M',   profitClass: 'positive', news: 'אנליסטים חלוקים: האם החברה יקרה מדי ביחס לרווחים?', price: 450 },
-    prime: { rev: '₪1.0B',  profit: '₪142M', profitClass: 'positive', news: 'ביצועים עקביים, אך חלק מהאנליסטים טוענים שהמניה יקרה.', price: 3600 },
-    fast:  { rev: '₪1.05B', profit: '₪170M', profitClass: 'positive', news: 'החברה מציגה שיאים חדשים, אך מתחרים חדשים נכנסים לשוק.', price: 1150 },
+    label: "שנה 2 מתוך 5", isTrial: false,
+    nova:  { rev: "₪760M",  profit: "₪5M",   profitClass: "pos", news: "אנליסטים חלוקים: האם החברה יקרה מדי ביחס לרווחים?", price: 450 },
+    prime: { rev: "₪1.0B",  profit: "₪142M", profitClass: "pos", news: "ביצועים עקביים, אך חלק מהאנליסטים טוענים שהמניה יקרה.", price: 3600 },
+    fast:  { rev: "₪1.05B", profit: "₪170M", profitClass: "pos", news: "החברה מציגה שיאים חדשים, אך מתחרים חדשים נכנסים לשוק.", price: 1150 },
   },
-
-  /* ── שנה 3 ── */
+  // Year 3
   {
-    label: 'שנה 3 מתוך 5',
-    nova:  { rev: '₪940M',  profit: '₪35M',  profitClass: 'positive', news: 'המוצר החדש מתחיל לצבור לקוחות, אך השוק עדיין סקפטי.', price: 530 },
-    prime: { rev: '₪1.06B', profit: '₪155M', profitClass: 'positive', news: 'החברה ממשיכה לצמוח לאט אך בעקביות.', price: 3960 },
-    fast:  { rev: '₪980M',  profit: '₪80M',  profitClass: 'positive', news: 'סדקים ראשונים: ירידה ברווחיות בעקבות מלחמת מחירים.', price: 720 },
+    label: "שנה 3 מתוך 5", isTrial: false,
+    nova:  { rev: "₪940M",  profit: "₪35M",  profitClass: "pos", news: "המוצר החדש מתחיל לצבור לקוחות, אך השוק עדיין סקפטי.", price: 530 },
+    prime: { rev: "₪1.06B", profit: "₪155M", profitClass: "pos", news: "החברה ממשיכה לצמוח לאט אך בעקביות.", price: 3960 },
+    fast:  { rev: "₪980M",  profit: "₪80M",  profitClass: "pos", news: "סדקים ראשונים: ירידה ברווחיות בעקבות מלחמת מחירים.", price: 720 },
   },
-
-  /* ── שנה 4 ── */
+  // Year 4
   {
-    label: 'שנה 4 מתוך 5',
-    nova:  { rev: '₪1.3B',  profit: '₪140M', profitClass: 'positive', news: 'החברה מדווחת על פריצה משמעותית במכירות המוצר החדש.', price: 850 },
-    prime: { rev: '₪1.12B', profit: '₪168M', profitClass: 'positive', news: 'ההנהלה שומרת על מדיניות שמרנית ועל רווחיות יציבה.', price: 4350 },
-    fast:  { rev: '₪760M',  profit: '₪-30M', profitClass: 'negative', news: 'החברה מאבדת נתח שוק והמנכ"לית פורשת במפתיע.', price: 320 },
+    label: "שנה 4 מתוך 5", isTrial: false,
+    nova:  { rev: "₪1.3B",  profit: "₪140M", profitClass: "pos", news: "החברה מדווחת על פריצה משמעותית במכירות המוצר החדש.", price: 850 },
+    prime: { rev: "₪1.12B", profit: "₪168M", profitClass: "pos", news: "ההנהלה שומרת על מדיניות שמרנית ועל רווחיות יציבה.", price: 4350 },
+    fast:  { rev: "₪760M",  profit: "₪-30M", profitClass: "neg", news: 'החברה מאבדת נתח שוק והמנכ"לית פורשת במפתיע.', price: 320 },
   },
-
-  /* ── שנה 5 (סיום) ── */
+  // Year 5
   {
-    label: 'שנה 5 מתוך 5',
-    nova:  { rev: '₪1.8B',  profit: '₪310M', profitClass: 'positive', news: 'NovaTech הופכת למובילת שוק בתחומה.', price: 1360 },
-    prime: { rev: '₪1.2B',  profit: '₪182M', profitClass: 'positive', news: 'עוד שנה יציבה לחברה הוותיקה.', price: 4800 },
-    fast:  { rev: '₪620M',  profit: '₪-90M', profitClass: 'negative', news: 'FastWave מתקשה להתאושש מול תחרות חזקה.', price: 200 },
+    label: "שנה 5 מתוך 5", isTrial: false,
+    nova:  { rev: "₪1.8B",  profit: "₪310M", profitClass: "pos", news: "NovaTech הופכת למובילת שוק בתחומה.", price: 1360 },
+    prime: { rev: "₪1.2B",  profit: "₪182M", profitClass: "pos", news: "עוד שנה יציבה לחברה הוותיקה.", price: 4800 },
+    fast:  { rev: "₪620M",  profit: "₪-90M", profitClass: "neg", news: "FastWave מתקשה להתאושש מול תחרות חזקה.", price: 200 },
   },
 ];
+
+// ── Helpers ───────────────────────────────────
+function fmt(n) {
+  return "₪" + Math.round(n).toLocaleString("he-IL");
+}
+
+// Calculate portfolio value after year transition
+// prevYearIdx → newYearIdx, based on alloc %
+function calcNewValue(totalValue, alloc, fromYearIdx, toYearIdx) {
+  const from = YEARS[fromYearIdx];
+  const to   = YEARS[toYearIdx];
+  let newTotal = 0;
+  COMPANIES.forEach(co => {
+    const pct    = (alloc[co.id] || 0) / 100;
+    const amount = totalValue * pct;
+    const ret    = (to[co.id].price - from[co.id].price) / from[co.id].price;
+    newTotal    += amount * (1 + ret);
+  });
+  return Math.round(newTotal);
+}
+
+// ── Server API calls ──────────────────────────
+async function apiGet(path) {
+  const res = await fetch(API_BASE + path);
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+async function apiDelete(path) {
+  const res = await fetch(API_BASE + path, { method: "DELETE" });
+  return res.json();
+}

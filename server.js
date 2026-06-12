@@ -1,71 +1,89 @@
-const express = require('express');
-const { WebSocketServer } = require('ws');
-const path = require('path');
+const express = require("express");
+const path    = require("path");
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+const ADMIN_PASS = process.env.ADMIN_PASS || "8114";
 
-// Serve all static files (HTML, CSS, JS)
+app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Start HTTP server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// ── In-memory state ──────────────────────────
+let openYear   = 0;       // 0=nothing, -1=trial, 1-5=real years
+let takenSlots = {};      // { [playerId]: playerName }
+let progress   = {};      // { [playerId]: { id, name, alloc, totalValue, done } }
+let gamePhase  = "intro"; // intro | trial | game | end
+
+// ── Health ───────────────────────────────────
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", openYear, gamePhase });
 });
 
-// ── WebSocket server ──────────────────────────
-const wss = new WebSocketServer({ server });
-
-// Keep track of all connected clients
-const clients = new Set();
-
-// Last known game state (so late joiners get it immediately)
-let lastGameState   = null;
-let lastPlayerState = {};   // { [playerId]: playerObject }
-
-wss.on('connection', (ws) => {
-  clients.add(ws);
-  console.log(`Client connected. Total: ${clients.size}`);
-
-  // Send current state to new connection immediately
-  if (lastGameState) {
-    ws.send(JSON.stringify({ type: 'gameState', payload: lastGameState }));
-  }
-
-  ws.on('message', (raw) => {
-    let msg;
-    try { msg = JSON.parse(raw); } catch { return; }
-
-    if (msg.type === 'gameState') {
-      // ADMIN broadcasting a new year / end
-      lastGameState = msg.payload;
-      broadcast({ type: 'gameState', payload: msg.payload }, ws);
-
-    } else if (msg.type === 'playerUpdate') {
-      // Player sending their portfolio update
-      const player = msg.payload;
-      lastPlayerState[player.id] = player;
-      broadcast({ type: 'playerUpdate', payload: player }, ws);
-    }
-  });
-
-  ws.on('close', () => {
-    clients.delete(ws);
-    console.log(`Client disconnected. Total: ${clients.size}`);
-  });
-
-  ws.on('error', (err) => {
-    console.error('WebSocket error:', err.message);
-    clients.delete(ws);
-  });
+// ── Year control (admin) ─────────────────────
+app.get("/api/year", (req, res) => {
+  res.json({ openYear, gamePhase });
 });
 
-// Broadcast to all clients except the sender
-function broadcast(msg, sender) {
-  const data = JSON.stringify(msg);
-  for (const client of clients) {
-    if (client !== sender && client.readyState === 1) {
-      client.send(data);
-    }
-  }
-}
+app.post("/api/year", (req, res) => {
+  if (req.query.pass !== ADMIN_PASS)
+    return res.status(401).json({ error: "Unauthorized" });
+  const { year, phase } = req.body;
+  if (typeof year === "number") openYear = year;
+  if (phase) gamePhase = phase;
+  // Mark all players as not done when year advances
+  Object.values(progress).forEach(p => { p.done = false; });
+  res.json({ ok: true, openYear, gamePhase });
+});
+
+// ── Player slots ─────────────────────────────
+app.get("/api/slots", (req, res) => {
+  res.json(takenSlots);
+});
+
+app.post("/api/slots", (req, res) => {
+  const { playerId, playerName } = req.body;
+  if (!playerId) return res.status(400).json({ error: "Invalid playerId" });
+  if (takenSlots[playerId]) return res.status(409).json({ error: "Slot taken" });
+  takenSlots[playerId] = playerName || `שחקנ/ית ${playerId}`;
+  // Init player progress
+  progress[playerId] = {
+    id:         playerId,
+    name:       takenSlots[playerId],
+    alloc:      { nova: 34, prime: 33, fast: 33 },
+    totalValue: 10000,
+    done:       false,
+  };
+  res.json({ ok: true });
+});
+
+// ── Player progress ───────────────────────────
+app.get("/api/progress", (req, res) => {
+  if (req.query.pass !== ADMIN_PASS)
+    return res.status(401).json({ error: "Unauthorized" });
+  res.json(Object.values(progress));
+});
+
+app.post("/api/progress", (req, res) => {
+  const p = req.body;
+  if (!p || !p.id) return res.status(400).json({ error: "Invalid" });
+  progress[p.id] = { ...progress[p.id], ...p };
+  res.json({ ok: true });
+});
+
+// ── Admin: all players summary (no password needed for live display) ──
+app.get("/api/players", (req, res) => {
+  res.json(Object.values(progress));
+});
+
+// ── Reset ─────────────────────────────────────
+app.delete("/api/reset", (req, res) => {
+  if (req.query.pass !== ADMIN_PASS)
+    return res.status(401).json({ error: "Unauthorized" });
+  openYear   = 0;
+  takenSlots = {};
+  progress   = {};
+  gamePhase  = "intro";
+  res.json({ ok: true });
+});
+
+app.listen(PORT, () => console.log(`Stock game server on port ${PORT}`));

@@ -1,13 +1,9 @@
 {
   "name": "stock-noise-game",
-  "version": "1.0.0",
-  "description": "Stock market educational game",
+  "version": "2.0.0",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "scripts": { "start": "node server.js" },
   "dependencies": {
-    "express": "^4.18.2",
-    "ws": "^8.14.2"
+    "express": "^4.18.2"
   }
 }
