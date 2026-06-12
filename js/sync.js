@@ -1,71 +1,134 @@
-const express = require('express');
-const { WebSocketServer } = require('ws');
-const path = require('path');
+/* =============================================
+   sync.js — סנכרון בין ADMIN לשחקנים
+               דרך WebSocket (אמיתי, בין מכשירים)
+   ============================================= */
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+const WS_URL = `wss://${window.location.host}`;
+let ws = null;
+let wsReady = false;
 
-// Serve all static files (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname)));
+function connectWebSocket() {
+  ws = new WebSocket(WS_URL);
 
-// Start HTTP server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  ws.onopen = () => {
+    wsReady = true;
+    console.log('WebSocket connected');
+  };
 
-// ── WebSocket server ──────────────────────────
-const wss = new WebSocketServer({ server });
+  ws.onclose = () => {
+    wsReady = false;
+    console.log('WebSocket disconnected — reconnecting in 2s...');
+    setTimeout(connectWebSocket, 2000);
+  };
 
-// Keep track of all connected clients
-const clients = new Set();
+  ws.onerror = (err) => {
+    console.error('WebSocket error:', err);
+  };
 
-// Last known game state (so late joiners get it immediately)
-let lastGameState   = null;
-let lastPlayerState = {};   // { [playerId]: playerObject }
-
-wss.on('connection', (ws) => {
-  clients.add(ws);
-  console.log(`Client connected. Total: ${clients.size}`);
-
-  // Send current state to new connection immediately
-  if (lastGameState) {
-    ws.send(JSON.stringify({ type: 'gameState', payload: lastGameState }));
-  }
-
-  ws.on('message', (raw) => {
+  ws.onmessage = (event) => {
     let msg;
-    try { msg = JSON.parse(raw); } catch { return; }
+    try { msg = JSON.parse(event.data); } catch { return; }
 
     if (msg.type === 'gameState') {
-      // ADMIN broadcasting a new year / end
-      lastGameState = msg.payload;
-      broadcast({ type: 'gameState', payload: msg.payload }, ws);
-
+      handleGameStateFromServer(msg.payload);
     } else if (msg.type === 'playerUpdate') {
-      // Player sending their portfolio update
-      const player = msg.payload;
-      lastPlayerState[player.id] = player;
-      broadcast({ type: 'playerUpdate', payload: player }, ws);
+      handlePlayerUpdateFromServer(msg.payload);
+    }
+  };
+}
+
+/* ─────────────────────────────────────────────
+   ADMIN → שחקנים
+   ───────────────────────────────────────────── */
+function syncPushToPlayers() {
+  sendWS({
+    type: 'gameState',
+    payload: {
+      phase:      gamePhase,
+      yearIndex:  currentYearIndex,
+      isTrial,
+      playerData: players,
+      ts:         Date.now(),
     }
   });
+}
 
-  ws.on('close', () => {
-    clients.delete(ws);
-    console.log(`Client disconnected. Total: ${clients.size}`);
+function syncPushEnd() {
+  sendWS({
+    type: 'gameState',
+    payload: {
+      phase:      'end',
+      yearIndex:  currentYearIndex,
+      isTrial:    false,
+      playerData: players,
+      ts:         Date.now(),
+    }
   });
+}
 
-  ws.on('error', (err) => {
-    console.error('WebSocket error:', err.message);
-    clients.delete(ws);
+/* ─────────────────────────────────────────────
+   שחקן → ADMIN
+   ───────────────────────────────────────────── */
+function syncPushPlayerUpdate() {
+  if (!currentPlayer) return;
+  sendWS({
+    type:    'playerUpdate',
+    payload: players[currentPlayer.id],
   });
-});
+}
 
-// Broadcast to all clients except the sender
-function broadcast(msg, sender) {
-  const data = JSON.stringify(msg);
-  for (const client of clients) {
-    if (client !== sender && client.readyState === 1) {
-      client.send(data);
+/* ─────────────────────────────────────────────
+   קבלת עדכונים מהשרת
+   ───────────────────────────────────────────── */
+function handleGameStateFromServer(gs) {
+  if (!currentPlayer) return;  // not a player tab
+
+  const onWaiting = document.getElementById('screen-player-waiting')
+    ?.classList.contains('active');
+  const onLogin = document.getElementById('screen-player-login')
+    ?.classList.contains('active');
+
+  if (onWaiting || onLogin) {
+    if (gs.phase === 'end') {
+      if (gs.playerData && gs.playerData[currentPlayer.id]) {
+        Object.assign(players[currentPlayer.id], gs.playerData[currentPlayer.id]);
+      }
+      showPlayerEnd();
+      return;
+    }
+
+    if (gs.yearIndex !== currentYearIndex) {
+      currentYearIndex = gs.yearIndex;
+      isTrial          = gs.isTrial;
+      if (gs.playerData) Object.assign(players, gs.playerData);
+      openPlayerGame();
     }
   }
 }
+
+function handlePlayerUpdateFromServer(player) {
+  if (!player) return;
+  // only admin tab processes this
+  const isAdminTab = document.getElementById('screen-admin') !== null
+    && document.getElementById('screen-player-login') === null;
+  if (!isAdminTab) return;
+
+  players[player.id] = player;
+  updateAdminGrid();
+}
+
+/* ─────────────────────────────────────────────
+   שליחה בטוחה
+   ───────────────────────────────────────────── */
+function sendWS(msg) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(msg));
+  } else {
+    console.warn('WebSocket not ready, message dropped:', msg.type);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   התחברות בטעינת הדף
+   ───────────────────────────────────────────── */
+connectWebSocket();
