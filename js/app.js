@@ -2,25 +2,22 @@
 // app.js — Player screen logic
 // =============================================
 
-// ── State ─────────────────────────────────────
 let S = {
   playerId:   null,
   playerName: null,
   alloc:      { nova: 34, prime: 33, fast: 33 },
   totalValue: STARTING_CASH,
-  yearIndex:  0,       // matches YEARS array
+  yearIndex:  0,
   done:       false,
   _poll:      null,
 };
 
-// ── Screen helper ─────────────────────────────
 function showSc(id) {
   document.querySelectorAll(".sc").forEach(s => s.classList.remove("on"));
   document.getElementById(id).classList.add("on");
   window.scrollTo(0, 0);
 }
 
-// ── Init ──────────────────────────────────────
 (function init() {
   renderPlayerGrid();
   document.getElementById("startBtn").addEventListener("click", joinGame);
@@ -29,8 +26,8 @@ function showSc(id) {
 
 // ── Player grid ───────────────────────────────
 async function renderPlayerGrid() {
-  const grid  = document.getElementById("playerGrid");
-  let taken   = {};
+  const grid = document.getElementById("playerGrid");
+  let taken  = {};
   try { taken = await apiGet("/api/slots"); } catch(e) {}
 
   grid.innerHTML = "";
@@ -45,7 +42,6 @@ async function renderPlayerGrid() {
     grid.appendChild(btn);
   }
 
-  // Poll for changes every 3s while on login screen
   clearInterval(S._poll);
   S._poll = setInterval(async () => {
     const sc = document.getElementById("scrLogin");
@@ -77,11 +73,8 @@ function selectPlayer(id, btn) {
 async function joinGame() {
   if (!S.playerId) return;
   clearInterval(S._poll);
-
   try {
-    const res = await apiPost("/api/slots", {
-      playerId: S.playerId, playerName: S.playerName,
-    });
+    const res = await apiPost("/api/slots", { playerId: S.playerId, playerName: S.playerName });
     if (!res.ok) { alert("המספר הזה כבר נלקח! בחר/י מספר אחר."); renderPlayerGrid(); return; }
   } catch(e) { alert("שגיאת חיבור לשרת"); return; }
 
@@ -93,7 +86,6 @@ async function joinGame() {
   document.getElementById("gTeam").innerHTML =
     `<span>${PLAYER_EMOJIS[S.playerId - 1]}</span> שחקנ/ית ${S.playerId}`;
   document.getElementById("gBal").textContent = fmt(S.totalValue);
-
   waitForYear();
 }
 
@@ -112,17 +104,13 @@ function waitForYear() {
     dots = (dots + 1) % 4;
     const el = document.getElementById("waitDots");
     if (el) el.textContent = "●".repeat(dots + 1);
-
     let state = { openYear: 0 };
     try { state = await apiGet("/api/year"); } catch(e) {}
-
     if (state.openYear === -1) {
-      // Trial opened
       clearInterval(S._poll);
       S.yearIndex = 0;
       showAllocScreen();
     } else if (state.openYear >= 1 && state.openYear <= 5) {
-      // Real year opened
       clearInterval(S._poll);
       S.yearIndex = state.openYear;
       showAllocScreen();
@@ -135,15 +123,34 @@ function showAllocScreen() {
   const yr = YEARS[S.yearIndex];
   document.getElementById("gBal").textContent = fmt(S.totalValue);
 
-  const stepLabel = yr.isTrial
-    ? `<div class="year-label">🎯 שנת ניסיון — לא נספרת</div>`
-    : `<div class="year-label">${yr.label}</div>`;
-
   const practiceBanner = yr.isTrial
     ? `<div class="practice-badge">🎯 שנת ניסיון — לתרגול בלבד, לא נספרת לתוצאות</div>`
     : "";
 
-  let slidersHtml = COMPANIES.map(co => `
+  // Company data cards (revenue + profit)
+  const companyCards = COMPANIES.map(co => {
+    const d = yr[co.id];
+    return `
+      <div class="co-data-card">
+        <div class="co-data-header">
+          <span class="co-data-icon" style="background:${co.bg};color:${co.color}">${co.icon}</span>
+          <span class="co-data-name">${co.name}</span>
+        </div>
+        <div class="co-data-fins">
+          <div class="co-data-fin">
+            <div class="co-data-fin-label">הכנסות</div>
+            <div class="co-data-fin-val">${d.rev}</div>
+          </div>
+          <div class="co-data-fin">
+            <div class="co-data-fin-label">רווח</div>
+            <div class="co-data-fin-val ${d.profitClass}">${d.profit}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+
+  // Sliders
+  const slidersHtml = COMPANIES.map(co => `
     <div class="sr">
       <div class="sh">
         <div class="sl">
@@ -156,12 +163,13 @@ function showAllocScreen() {
         </div>
       </div>
       <input type="range" class="alloc-slider" id="sl_${co.id}"
-        min="0" max="100" step="5" value="${S.alloc[co.id]}" />
+        min="0" max="100" step="1" value="${S.alloc[co.id]}" />
     </div>`).join("");
 
   document.getElementById("gContent").innerHTML = `
-    ${stepLabel}
+    <div class="year-label">${yr.isTrial ? "🎯 שנת ניסיון" : yr.label}</div>
     ${practiceBanner}
+    <div class="co-data-row">${companyCards}</div>
     <div class="alc">
       <div class="alc-t">📊 בחרי את התמהיל שלך</div>
       ${slidersHtml}
@@ -175,7 +183,6 @@ function showAllocScreen() {
       updateSliders();
     });
   });
-
   document.getElementById("allocBtn").addEventListener("click", confirmAlloc);
   updateSliders();
 }
@@ -205,26 +212,19 @@ function checkTotal() {
   }
 }
 
-// ── Confirm allocation ────────────────────────
+// ── Confirm ───────────────────────────────────
 async function confirmAlloc() {
   const sum = COMPANIES.reduce((s, co) => s + (S.alloc[co.id] || 0), 0);
   if (sum !== 100) return;
-
   S.done = true;
-
-  // Save progress to server
   try {
     await apiPost("/api/progress", {
-      id:         S.playerId,
-      name:       S.playerName,
-      alloc:      S.alloc,
-      totalValue: S.totalValue,
-      yearIndex:  S.yearIndex,
-      done:       true,
+      id: S.playerId, name: S.playerName,
+      alloc: S.alloc, totalValue: S.totalValue,
+      yearIndex: S.yearIndex, done: true,
     });
   } catch(e) {}
 
-  // If trial, wait for admin to start real game
   if (YEARS[S.yearIndex].isTrial) {
     showWaitingScreen(true);
     waitForRealGame();
@@ -236,7 +236,7 @@ async function confirmAlloc() {
   }
 }
 
-// ── Waiting screen (after confirming alloc) ───
+// ── Waiting screen ────────────────────────────
 function showWaitingScreen(isTrial) {
   const tv = S.totalValue;
   let summaryHtml = COMPANIES.map(co => {
@@ -257,27 +257,24 @@ function showWaitingScreen(isTrial) {
   document.getElementById("gContent").innerHTML = `
     <div class="wait-screen">
       <div class="wait-avatar">${PLAYER_EMOJIS[S.playerId - 1]}</div>
-      <div class="wait-title">ממתינים לשנה הבאה ✓</div>
-      <div class="wait-sub">${isTrial ? "המנהלת תאפס ותפתח את המשחק האמיתי" : "המנהלת תפתח את השנה הבאה בקרוב"}</div>
+      <div class="wait-title">סיימתי! ממתינים... ✓</div>
+      <div class="wait-sub">${isTrial ? "המנהלת תפתח את המשחק האמיתי בקרוב" : "המנהלת תפתח את השנה הבאה בקרוב"}</div>
       <div class="wait-summary">${summaryHtml}</div>
       <div class="dots-loader" id="waitDots">●</div>
     </div>`;
 }
 
-// ── Poll for real game start (after trial) ────
+// ── Poll for real game ────────────────────────
 function waitForRealGame() {
   let dots = 0;
   S._poll = setInterval(async () => {
     dots = (dots + 1) % 4;
     const el = document.getElementById("waitDots");
     if (el) el.textContent = "●".repeat(dots + 1);
-
     let state = { openYear: 0 };
     try { state = await apiGet("/api/year"); } catch(e) {}
-
     if (state.openYear >= 1) {
       clearInterval(S._poll);
-      // Reset for real game
       S.totalValue = STARTING_CASH;
       S.alloc      = { nova: 34, prime: 33, fast: 33 };
       S.yearIndex  = state.openYear;
@@ -296,14 +293,11 @@ function waitForNextYear() {
     dots = (dots + 1) % 4;
     const el = document.getElementById("waitDots");
     if (el) el.textContent = "●".repeat(dots + 1);
-
     let state = { openYear: 0 };
     try { state = await apiGet("/api/year"); } catch(e) {}
-
     const nextIdx = currentYearIdx + 1;
     if (state.openYear >= nextIdx) {
       clearInterval(S._poll);
-      // Calculate new portfolio value
       S.totalValue = calcNewValue(S.totalValue, S.alloc, currentYearIdx, nextIdx);
       S.yearIndex  = nextIdx;
       S.done       = false;
@@ -318,8 +312,10 @@ function waitForNextYear() {
 function showResults() {
   showSc("scrResults");
 
-  const pct    = ((S.totalValue - STARTING_CASH) / STARTING_CASH * 100).toFixed(1);
-  const isPos  = S.totalValue >= STARTING_CASH;
+  // Return always vs STARTING_CASH (initial investment)
+  const gain   = S.totalValue - STARTING_CASH;
+  const pct    = (gain / STARTING_CASH * 100).toFixed(1);
+  const isPos  = gain >= 0;
   const trophy = S.totalValue >= STARTING_CASH * 1.8 ? "🏆" :
                  S.totalValue >= STARTING_CASH * 1.3 ? "🥈" :
                  S.totalValue >= STARTING_CASH        ? "🌱" : "📉";
@@ -327,14 +323,12 @@ function showResults() {
   document.getElementById("rTeam").textContent =
     `${PLAYER_EMOJIS[S.playerId - 1]} שחקנ/ית ${S.playerId}`;
   document.getElementById("rAmount").textContent = fmt(S.totalValue);
-
-  const rr = document.getElementById("rReturn");
-  rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה כוללת`;
-  rr.className   = `fr ${isPos ? "pos" : "neg"}`;
-
   document.getElementById("rTrophy").textContent = trophy;
 
-  // Holdings breakdown
+  const rr = document.getElementById("rReturn");
+  rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה על ₪${(STARTING_CASH/1000).toFixed(0)}K`;
+  rr.className   = `fr ${isPos ? "pos" : "neg"}`;
+
   let det = `<div class="det-t">תמהיל סופי</div>`;
   COMPANIES.forEach(co => {
     const pctAlloc = S.alloc[co.id] || 0;
@@ -344,7 +338,6 @@ function showResults() {
     </div>`;
   });
   document.getElementById("rDetails").innerHTML = det;
-
   document.getElementById("restartBtn").addEventListener("click", restart);
 }
 

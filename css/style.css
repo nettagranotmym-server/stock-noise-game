@@ -452,3 +452,62 @@ input[type=range]::-moz-range-thumb {
 /* ── Animations ── */
 @keyframes fiu { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pls { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+
+/* ── Company data cards (player screen) ── */
+.co-data-row {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;
+}
+
+.co-data-card {
+  background: var(--card); border-radius: 12px; padding: 10px 14px;
+  border: 1px solid var(--brd); box-shadow: 0 2px 8px var(--shadow);
+}
+
+.co-data-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+
+.co-data-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+
+.co-data-name {
+  font-family: 'Rubik', sans-serif; font-size: 14px;
+  font-weight: 700; color: var(--txt);
+}
+
+.co-data-fins {
+  display: flex; gap: 8px;
+}
+
+.co-data-fin {
+  flex: 1; background: var(--card2); border-radius: 8px;
+  padding: 6px 10px; text-align: center;
+}
+
+.co-data-fin-label {
+  font-size: 10px; color: var(--txt3); font-weight: 700; margin-bottom: 2px;
+}
+
+.co-data-fin-val {
+  font-size: 13px; font-weight: 800; color: var(--txt);
+}
+.co-data-fin-val.neg { color: var(--red); }
+.co-data-fin-val.pos { color: var(--green); }
+
+/* ── Admin: news label ── */
+.news-label {
+  font-size: 10px; font-weight: 700; color: var(--txt3);
+  letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: 4px; margin-top: 10px;
+}
+
+/* ── Admin: intro financials ── */
+.co-fins-intro {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+
+/* ── Admin players: remove ready-count, keep underline only ── */
+.ready-count { display: none; }

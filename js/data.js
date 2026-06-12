@@ -2,21 +2,19 @@
 // data.js — כל נתוני המשחק
 // =============================================
 
-const STARTING_CASH = 10000;
+const STARTING_CASH = 100000;
 const MAX_PLAYERS   = 20;
-const API_BASE      = "";   // same-origin
+const API_BASE      = "";
 
-// ── Player emojis (auto-assigned by number) ──
 const PLAYER_EMOJIS = [
   "😊","😎","🤩","🧐","😄","🥳","🤓","😏","🙂","😁",
   "😀","🤗","😌","😇","🥸","😉","😋","🤔","😃","😆"
 ];
 
-// ── Companies ────────────────────────────────
 const COMPANIES = [
   {
     id: "nova", name: "NovaTech", icon: "🚀",
-    tag: "חברת צמיחה", tagClass: "tag-nova", cardClass: "nova",
+    cardClass: "nova",
     color: "var(--accent)", bg: "rgba(124,58,237,.15)",
     moat: 3, mgmt: 3, debt: 1,
     story: "החברה משקיעה הרבה בפיתוח מוצרים חדשים. כרגע הרווחיות נמוכה, אך יש לה טכנולוגיה ייחודית שקשה למתחרים להעתיק.",
@@ -24,7 +22,7 @@ const COMPANIES = [
   },
   {
     id: "prime", name: "Prime Holdings", icon: "🏦",
-    tag: "חברה יציבה", tagClass: "tag-prime", cardClass: "prime",
+    cardClass: "prime",
     color: "var(--green)", bg: "rgba(5,150,105,.15)",
     moat: 2, mgmt: 3, debt: 3,
     story: "חברה ותיקה ומבוססת. לא צפויה לצמוח במהירות, אך מייצרת הכנסות ורווחים בצורה עקבית.",
@@ -32,7 +30,7 @@ const COMPANIES = [
   },
   {
     id: "fast", name: "FastWave", icon: "⚡",
-    tag: "חברה מבטיחה", tagClass: "tag-fast", cardClass: "fast",
+    cardClass: "fast",
     color: "var(--pink)", bg: "rgba(192,38,211,.15)",
     moat: 2, mgmt: 2, debt: 3,
     story: "החברה מציגה תוצאות חזקות וצומחת מהר, אך פועלת בתחום שבו התחרות הולכת וגוברת.",
@@ -40,16 +38,14 @@ const COMPANIES = [
   },
 ];
 
-// ── Years ─────────────────────────────────────
-// index 0 = trial, 1-5 = real game
-// returns = price change ratio vs previous year
+// index 0 = trial, 1-5 = real years
 const YEARS = [
   // Trial
   {
     label: "שנת ניסיון", isTrial: true,
-    nova:  { rev: "₪500M", profit: "₪-20M", profitClass: "neg", news: "החברה מגדילה השקעות בפיתוח – המשקיעים חוששים מהרווחיות הנמוכה.", price: 500 },
-    prime: { rev: "₪900M", profit: "₪120M", profitClass: "pos", news: "החברה ממשיכה להציג יציבות ורווחיות גבוהה.", price: 3000 },
-    fast:  { rev: "₪700M", profit: "₪90M",  profitClass: "pos", news: "FastWave מכה את התחזיות והמניה מושכת עניין רב.", price: 800 },
+    nova:  { rev: "₪500M", profit: "₪-20M",  profitClass: "neg", news: "החברה מגדילה השקעות בפיתוח – המשקיעים חוששים מהרווחיות הנמוכה.", price: 500 },
+    prime: { rev: "₪900M", profit: "₪120M",  profitClass: "pos", news: "החברה ממשיכה להציג יציבות ורווחיות גבוהה.", price: 3000 },
+    fast:  { rev: "₪700M", profit: "₪90M",   profitClass: "pos", news: "FastWave מכה את התחזיות והמניה מושכת עניין רב.", price: 800 },
   },
   // Year 1
   {
@@ -93,8 +89,6 @@ function fmt(n) {
   return "₪" + Math.round(n).toLocaleString("he-IL");
 }
 
-// Calculate portfolio value after year transition
-// prevYearIdx → newYearIdx, based on alloc %
 function calcNewValue(totalValue, alloc, fromYearIdx, toYearIdx) {
   const from = YEARS[fromYearIdx];
   const to   = YEARS[toYearIdx];
@@ -108,7 +102,6 @@ function calcNewValue(totalValue, alloc, fromYearIdx, toYearIdx) {
   return Math.round(newTotal);
 }
 
-// ── Server API calls ──────────────────────────
 async function apiGet(path) {
   const res = await fetch(API_BASE + path);
   return res.json();
