@@ -11,33 +11,63 @@
 <div class="bgp"></div>
 <div class="ct">
 
-  <!-- LOGIN -->
+  <!-- מסך 1: בחירת שחקן -->
   <div class="sc ws on" id="scrLogin">
     <div class="wt">משחק המניות 📈</div>
     <div class="tsa">
       <div class="tsl">בחר/י את המספר שלך:</div>
       <div class="tg" id="playerGrid"></div>
-      <button class="sbtn" id="startBtn">כניסה למשחק ➡️</button>
+      <button class="sbtn" id="startBtn">המשך ➡️</button>
+      <button class="refresh-btn" id="refreshBtn">↺ רענן רשימה</button>
     </div>
     <div class="brand-footer">אפליקציה מבית <span>SHEvyon</span></div>
   </div>
 
-  <!-- GAME -->
+  <!-- מסך 2: הוראות -->
+  <div class="sc ws" id="scrIntro">
+    <div class="wt">איך משחקים? 🎯</div>
+    <div class="intro-card">
+      <div class="intro-row">
+        <span class="intro-icon">💰</span>
+        <div>קיבלת <strong>₪100,000</strong> במתנה והחלטת להשקיע אותם.</div>
+      </div>
+      <div class="intro-row">
+        <span class="intro-icon">🖥️</span>
+        <div>לפניך <strong>3 חברות</strong> — המידע עליהן מוצג על המסך הגדול.</div>
+      </div>
+      <div class="intro-row">
+        <span class="intro-icon">📊</span>
+        <div>בכל שנה תחליט/י <strong>כמה מהכסף</strong> להשקיע בכל חברה באמצעות הסליידרים.</div>
+      </div>
+      <div class="intro-row">
+        <span class="intro-icon">🔄</span>
+        <div>בכל שנה אפשר <strong>לשנות את התמהיל</strong> — למכור מחברה אחת ולקנות אחרת.</div>
+      </div>
+      <div class="intro-row">
+        <span class="intro-icon">🏆</span>
+        <div>המטרה: להגיע לסוף עם <strong>הכי הרבה כסף</strong>!</div>
+      </div>
+    </div>
+    <button class="sbtn en" id="goGameBtn">יאללה, נתחיל! 🚀</button>
+    <div class="brand-footer">אפליקציה מבית <span>SHEvyon</span></div>
+  </div>
+
+  <!-- מסך 3: משחק -->
   <div class="sc" id="scrGame">
     <div class="gh">
       <div class="gtn" id="gTeam"></div>
       <div class="gbal">
         <div class="gbs">שווי תיק</div>
-        <div class="gbv" id="gBal">₪10,000</div>
+        <div class="gbv" id="gBal">₪100,000</div>
       </div>
     </div>
     <div id="gContent"></div>
   </div>
 
-  <!-- RESULTS -->
+  <!-- מסך 4: תוצאות -->
   <div class="sc rs" id="scrResults">
     <div class="rh">
-      <div style="font-size:48px" id="rTrophy">🏆</div>
+      <div style="font-size:52px;margin-bottom:8px" id="rTrophy">🏆</div>
       <div class="rtt">המשחק הסתיים!</div>
       <div class="rts" id="rTeam"></div>
     </div>

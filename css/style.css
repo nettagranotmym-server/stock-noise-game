@@ -525,3 +525,112 @@ input[type=range]::-moz-range-thumb {
 .ret-up   { background: #d1fae5; color: #059669; }
 .ret-down { background: #fee2e2; color: #dc2626; }
 .ret-flat { background: var(--card2); color: var(--txt3); }
+
+/* ── Refresh button ── */
+.refresh-btn {
+  background: transparent; border: 1px solid var(--brd2);
+  color: var(--txt3); border-radius: 8px; padding: 8px 16px;
+  font-family: 'Heebo', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; margin-top: 6px; transition: all .2s; width: 100%;
+}
+.refresh-btn:hover { background: var(--card2); color: var(--primary); }
+
+/* ── Intro card ── */
+.intro-card {
+  background: var(--card); border-radius: 14px; padding: 16px;
+  border: 1px solid var(--brd); box-shadow: 0 2px 12px var(--shadow);
+  width: 100%; display: flex; flex-direction: column; gap: 12px;
+  text-align: right;
+}
+.intro-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 15px; color: var(--txt2); line-height: 1.5;
+}
+.intro-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Compact company row ── */
+.co-rows-wrap {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;
+}
+
+.co-row {
+  background: var(--card); border-radius: 10px; padding: 10px 12px;
+  border: 1px solid var(--brd); box-shadow: 0 1px 6px var(--shadow);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.co-row-left {
+  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+}
+
+.co-row-icon {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+
+.co-row-info { min-width: 0; }
+
+.co-row-name {
+  font-family: 'Rubik', sans-serif; font-size: 14px;
+  font-weight: 700; color: var(--txt); white-space: nowrap;
+}
+
+.co-row-fins {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--txt3); margin-top: 2px; flex-wrap: wrap;
+}
+
+.co-fin-item { color: var(--txt2); }
+.co-fin-item.pos strong { color: var(--green); }
+.co-fin-item.neg strong { color: var(--red); }
+.co-fin-sep { color: var(--brd2); }
+
+.co-row-right {
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: 3px; flex-shrink: 0; margin-right: 8px;
+}
+
+.co-row-price {
+  font-family: 'Rubik', sans-serif; font-size: 15px;
+  font-weight: 900; color: var(--txt); direction: ltr;
+}
+
+.ret-badge {
+  font-size: 12px; font-weight: 700;
+  padding: 2px 7px; border-radius: 6px;
+}
+.ret-up   { background: #d1fae5; color: #059669; }
+.ret-down { background: #fee2e2; color: #dc2626; }
+.ret-flat { background: var(--card2); color: var(--txt3); }
+
+/* ── Tighter slider section ── */
+.alc { padding: 8px 10px; }
+.sr  { margin-bottom: 8px; }
+
+/* ── Admin company block (row + news) ── */
+.admin-co-block {
+  border-radius: 10px; border: 1px solid var(--brd);
+  box-shadow: 0 2px 8px var(--shadow); overflow: hidden; margin-bottom: 0;
+}
+
+.admin-news-row {
+  background: var(--card2); padding: 8px 12px;
+  font-size: 13px; color: var(--txt2); line-height: 1.5;
+  border-top: 1px solid var(--brd);
+}
+
+.news-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  color: var(--txt3); letter-spacing: .5px; text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* ── Admin year cards: 3 columns ── */
+#yearCards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  #yearCards { grid-template-columns: 1fr; }
+}

@@ -119,37 +119,44 @@ function dots(filled, total, color) {
 
 // ── Year cards ────────────────────────────────
 function buildYearCards(yi) {
-  const row  = document.getElementById("yearCards");
+  const container = document.getElementById("yearCards");
   const yr   = YEARS[yi];
   const prev = yi > 0 ? YEARS[yi - 1] : null;
 
-  row.innerHTML = COMPANIES.map(co => {
+  container.innerHTML = COMPANIES.map(co => {
     const d = yr[co.id];
-    let chgHtml = "";
+    let retHtml = "";
     if (prev) {
       const p   = prev[co.id].price;
       const pct = ((d.price - p) / p * 100).toFixed(1);
-      const cls = pct > 0 ? "chg-up" : pct < 0 ? "chg-down" : "chg-same";
-      chgHtml = `<span class="price-chg ${cls}">${pct > 0 ? "+" : ""}${pct}%</span>`;
+      const cls = pct > 0 ? "ret-up" : pct < 0 ? "ret-down" : "ret-flat";
+      retHtml = `<span class="ret-badge ${cls}">${pct > 0 ? "+" : ""}${pct}%</span>`;
     }
     return `
-      <div class="year-co-card">
-        <div class="year-co-header">
-          <div>
-            <div class="co-name" style="font-size:16px">${co.icon} ${co.name}</div>
+      <div class="admin-co-block">
+        <div class="co-row" style="border-radius:10px 10px 0 0;border-bottom:none">
+          <div class="co-row-left">
+            <span class="co-row-icon" style="background:${co.bg};color:${co.color};width:36px;height:36px;font-size:18px">${co.icon}</span>
+            <div class="co-row-info">
+              <div class="co-row-name" style="font-size:16px">${co.name}</div>
+              <div class="co-row-fins">
+                <span class="co-fin-item">הכנסות <strong>${d.rev}</strong></span>
+                <span class="co-fin-sep">·</span>
+                <span class="co-fin-item ${d.profitClass}">רווח <strong>${d.profit}</strong></span>
+              </div>
+            </div>
           </div>
-          <div class="price-block">
-            <div class="price-now">₪${d.price.toLocaleString("he-IL")}</div>
-            ${chgHtml}
+          <div class="co-row-right">
+            <div class="co-row-price">&#x20AA;${d.price.toLocaleString("he-IL")}</div>
+            ${retHtml}
           </div>
         </div>
-        <div class="news-label">ידיעה מהעיתונות</div>
-        <div class="news-bar">📰 ${d.news}</div>
-        <div class="fin-row">
-          <div class="fin-box"><div class="fin-lbl">הכנסות</div><div class="fin-val">${d.rev}</div></div>
-          <div class="fin-box"><div class="fin-lbl">רווח</div><div class="fin-val ${d.profitClass}">${d.profit}</div></div>
+        <div class="admin-news-row">
+          <span class="news-tag">ידיעה מהעיתונות</span>
+          📰 ${d.news}
         </div>
-      </div>`}).join("");
+      </div>`;
+  }).join("");
 }
 
 // ── Players grid ──────────────────────────────
