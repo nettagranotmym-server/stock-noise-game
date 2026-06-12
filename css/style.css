@@ -156,6 +156,8 @@ body {
 }
 .player-btn:hover   { border-color: var(--purple-light); background: var(--purple-pale); }
 .player-btn.selected{ border-color: var(--purple-mid);   background: var(--purple-pale); }
+.player-btn.taken       { opacity: 0.35; cursor: not-allowed; background: var(--gray-light); }
+.player-btn.taken:hover { border-color: transparent; background: var(--gray-light); }
 .player-btn .p-num  { font-size: 18px; font-weight: 800; color: var(--purple-deep); }
 .player-btn .p-label{ font-size: 10px; color: var(--gray-dark); margin-top: 2px; }
 

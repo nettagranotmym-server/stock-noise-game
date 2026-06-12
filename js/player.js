@@ -8,7 +8,6 @@
 function goPlayerLogin() {
   showScreen('screen-player-login');
   buildPlayerGrid();
-  buildAvatarGrid();
 }
 
 function buildPlayerGrid() {
@@ -18,10 +17,11 @@ function buildPlayerGrid() {
   for (let i = 1; i <= MAX_PLAYERS; i++) {
     const joined = !!players[i];
     const btn    = document.createElement('button');
-    btn.className = 'player-btn' + (joined ? ' selected' : '');
+    btn.className = 'player-btn' + (joined ? ' taken' : '');
+    btn.disabled  = joined;
     btn.innerHTML = `
       <div class="p-num">${i}</div>
-      <div class="p-label">${joined ? players[i].avatar : 'פנוי'}</div>`;
+      <div class="p-label">${joined ? 'תפוס' : 'פנוי'}</div>`;
     if (!joined) btn.onclick = () => selectPlayerNum(i);
     grid.appendChild(btn);
   }
@@ -29,49 +29,30 @@ function buildPlayerGrid() {
 
 function selectPlayerNum(num) {
   selectedPlayerNum = num;
-  document.querySelectorAll('.player-btn').forEach((b, i) => {
-    b.classList.toggle('selected', i + 1 === num);
+  document.querySelectorAll('.player-btn').forEach(b => {
+    const n = parseInt(b.querySelector('.p-num').textContent);
+    b.classList.toggle('selected', n === num);
   });
-  document.getElementById('avatarSection').classList.add('visible');
-  checkJoinReady();
-}
-
-function buildAvatarGrid() {
-  const grid = document.getElementById('avatarGrid');
-  grid.innerHTML = '';
-  ALL_AVATARS.forEach(a => {
-    const btn    = document.createElement('button');
-    btn.className = 'avatar-btn';
-    btn.textContent = a;
-    btn.onclick  = () => selectAvatar(a, btn);
-    grid.appendChild(btn);
-  });
-}
-
-function selectAvatar(avatar, btn) {
-  selectedAvatar = avatar;
-  document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  checkJoinReady();
-}
-
-function checkJoinReady() {
-  document.getElementById('joinBtn').disabled = !(selectedPlayerNum && selectedAvatar);
+  document.getElementById('joinBtn').disabled = false;
 }
 
 function joinGame() {
-  if (!selectedPlayerNum || !selectedAvatar) return;
+  if (!selectedPlayerNum) return;
+
+  const defaultAvatars = ['😊','😎','🤩','🧐','😄','🥳','🤓','😏','🙂','😁',
+                          '😀','🤗','😌','😇','🥸','😉','😋','🤔','😃','😆'];
+  const avatar = defaultAvatars[(selectedPlayerNum - 1) % defaultAvatars.length];
 
   players[selectedPlayerNum] = {
     id:       selectedPlayerNum,
-    avatar:   selectedAvatar,
-    cash:     100_000,
+    avatar,
+    cash:     STARTING_CASH,
     holdings: { nova: 0, prime: 0, fast: 0 },
     done:     false,
     history:  [],
   };
 
-  currentPlayer = { id: selectedPlayerNum, avatar: selectedAvatar };
+  currentPlayer = { id: selectedPlayerNum, avatar };
   syncPushPlayerUpdate();
   updateAdminGrid();
 
@@ -121,9 +102,9 @@ function buildPlayerCards() {
 
   /* Company cards */
   COMPANIES.forEach(co => {
-    const data     = YEARS_DATA[currentYearIndex][co.id];
-    const held     = p.holdings[co.id] || 0;
-    const holdVal  = held * data.price;
+    const data    = YEARS_DATA[currentYearIndex][co.id];
+    const held    = p.holdings[co.id] || 0;
+    const holdVal = held * data.price;
 
     body.innerHTML += `
       <div class="trading-card ${co.cardClass}" id="card-${co.id}">
@@ -133,7 +114,7 @@ function buildPlayerCards() {
             <div class="tc-company-name">${co.name}</div>
           </div>
           <div class="tc-price-block">
-            <div class="tc-price">₪${data.price}</div>
+            <div class="tc-price">₪${data.price.toLocaleString('he')}</div>
             <div class="tc-price-change" style="color:var(--gray-dark)">למניה</div>
           </div>
         </div>
@@ -158,7 +139,6 @@ function buildPlayerCards() {
   });
 }
 
-/* רענון כרטיס בודד אחרי עסקה */
 function refreshPlayerCard(coId) {
   const p    = players[currentPlayer.id];
   const data = YEARS_DATA[currentYearIndex][coId];
@@ -172,7 +152,7 @@ function refreshPlayerCard(coId) {
 }
 
 /* ─────────────────────────────────────────────
-   DONE — שחקן סיים לסחור
+   DONE
    ───────────────────────────────────────────── */
 function playerDone() {
   const p = players[currentPlayer.id];
@@ -231,15 +211,15 @@ function showPlayerEnd() {
   if (!currentPlayer) return;
   const p        = players[currentPlayer.id];
   const finalVal = getPortfolioValue(currentPlayer.id);
-  const pct      = ((finalVal - 100_000) / 100_000 * 100).toFixed(1);
-  const isGood   = finalVal >= 100_000;
+  const pct      = ((finalVal - STARTING_CASH) / STARTING_CASH * 100).toFixed(1);
+  const isGood   = finalVal >= STARTING_CASH;
 
   const trophy =
-    finalVal >= 150_000 ? '🏆' :
-    finalVal >= 120_000 ? '🥈' :
-    finalVal >= 100_000 ? '🌱' : '📉';
+    finalVal >= STARTING_CASH * 1.5 ? '🏆' :
+    finalVal >= STARTING_CASH * 1.2 ? '🥈' :
+    finalVal >= STARTING_CASH       ? '🌱' : '📉';
 
-  document.getElementById('endTrophy').textContent    = trophy;
+  document.getElementById('endTrophy').textContent     = trophy;
   document.getElementById('endPlayerName').textContent =
     `${p.avatar} שחקנ/ית ${p.id}`;
 
@@ -285,6 +265,5 @@ function showPlayerEnd() {
 function resetGame() {
   currentPlayer     = null;
   selectedPlayerNum = null;
-  selectedAvatar    = null;
   showScreen('screen-role');
 }

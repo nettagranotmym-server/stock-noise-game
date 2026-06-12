@@ -10,79 +10,13 @@
 </head>
 <body>
 
-<!-- ===== ROLE SELECT ===== -->
-<div id="screen-role" class="screen active">
-  <div class="role-logo">משחק<span>המניות</span> 📈</div>
-  <div class="role-subtitle">בחרי מי את במשחק</div>
-  <div class="role-cards">
-    <div class="role-card" onclick="window.location.href='admin.html'">
-      <div class="role-icon">🖥️</div>
-      <div class="role-name">מסך ADMIN</div>
-      <div class="role-desc">לוח הבקרה המרכזי<br>מוקרן על הקיר</div>
-    </div>
-    <div class="role-card" onclick="goPlayerLogin()">
-      <div class="role-icon">📱</div>
-      <div class="role-name">אני שחקנ/ית</div>
-      <div class="role-desc">המסך האישי שלי<br>לסחור במניות</div>
-    </div>
-  </div>
-</div>
-
 <!-- ===== PLAYER LOGIN ===== -->
-<div id="screen-player-login" class="screen">
+<div id="screen-player-login" class="screen active">
   <div class="login-box">
-    <div class="login-title">ברוכ/ה הבא/ה!</div>
-    <div class="login-subtitle">בחר/י את מספרך ואווטר</div>
+    <div class="login-title">משחק<span style="color:var(--pink-hot)">המניות</span> 📈</div>
+    <div class="login-subtitle">בחר/י את מספרך</div>
     <div class="player-grid" id="playerGrid"></div>
-    <div class="avatar-section" id="avatarSection">
-      <h3>בחר/י אווטר</h3>
-      <div class="avatar-grid" id="avatarGrid"></div>
-      <button class="btn-primary" id="joinBtn" disabled onclick="joinGame()">כניסה למשחק ✨</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== ADMIN SCREEN ===== -->
-<div id="screen-admin" class="screen">
-  <div class="admin-header">
-    <div class="admin-logo">משחק<span>המניות</span></div>
-    <div id="adminYearBadge" class="admin-year-badge">שלב מבוא</div>
-    <div class="admin-controls">
-      <div id="adminPilot" class="pilot-badge">ניסיון</div>
-      <button class="btn-admin btn-admin-secondary" id="btnAdminStart" onclick="adminStartGame()">▶ התחל משחק</button>
-      <button class="btn-admin btn-admin-primary" id="btnAdminNext" onclick="adminNextYear()" disabled>שנה הבאה ←</button>
-      <button class="btn-admin btn-admin-secondary" id="btnAdminEnd" onclick="adminShowEnd()" style="display:none">📊 סיכום</button>
-    </div>
-  </div>
-
-  <div class="admin-body">
-    <!-- INTRO VIEW -->
-    <div class="admin-intro-view" id="adminIntroView">
-      <div class="admin-intro" id="adminIntroCards"></div>
-    </div>
-
-    <!-- YEAR VIEW -->
-    <div class="admin-year-view" id="adminYearView">
-      <div class="year-companies-row" id="adminYearCards"></div>
-    </div>
-
-    <!-- END VIEW -->
-    <div class="admin-end-view" id="adminEndView">
-      <div class="leaderboard-grid" id="adminLeaderboard"></div>
-      <div class="insight-card insight-card--light">
-        <div class="insight-icon">💡</div>
-        <div class="insight-text insight-text--dark">
-          "חדשות יכולות להפחיד או להלהיב – אבל הן לא תמיד משקפות את איכות העסק. משקיעה טובה לומדת להבדיל בין רעש לבין שינוי אמיתי."
-        </div>
-      </div>
-    </div>
-
-    <!-- PLAYERS SECTION -->
-    <div class="players-section" id="playersSection">
-      <div class="players-section-title">שחקנים מחוברים</div>
-      <div class="players-grid-admin" id="adminPlayersGrid"></div>
-      <div class="ready-count" id="readyCount">0 / 0 מוכנים</div>
-    </div>
+    <button class="btn-primary" id="joinBtn" disabled onclick="joinGame()">כניסה למשחק ✨</button>
   </div>
 </div>
 
@@ -98,7 +32,7 @@
     </div>
     <div class="player-portfolio-value">
       <div class="portfolio-label">שווי תיק</div>
-      <div class="portfolio-amount" id="phPortfolio">₪100,000</div>
+      <div class="portfolio-amount" id="phPortfolio">₪10,000</div>
     </div>
   </div>
 
@@ -111,7 +45,7 @@
 
 <!-- ===== WAITING SCREEN ===== -->
 <div id="screen-player-waiting" class="screen">
-  <div class="waiting-avatar" id="waitingAvatar">🙂</div>
+  <div class="waiting-avatar" id="waitingAvatar">😊</div>
   <div class="waiting-title">מחכה לשנה הבאה...</div>
   <div class="waiting-sub" id="waitingSub">ה-ADMIN יפתח את השנה הבאה בקרוב</div>
   <div class="portfolio-summary-waiting" id="waitingSummary"></div>
@@ -127,7 +61,7 @@
   <div class="end-body" id="endBody"></div>
 </div>
 
-<!-- ===== TRADE MODAL ===== -->
+<!-- TRADE MODAL -->
 <div class="modal-overlay" id="tradeModal">
   <div class="trade-modal">
     <div class="modal-title" id="modalTitle">קנייה</div>
@@ -158,7 +92,7 @@
   </div>
 </div>
 
-<!-- ===== TOAST ===== -->
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="js/data.js"></script>
@@ -169,5 +103,9 @@
 <script src="js/modal.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/app.js"></script>
+<script>
+  // On player page, go straight to login
+  goPlayerLogin();
+</script>
 </body>
 </html>
