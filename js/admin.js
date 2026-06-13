@@ -55,9 +55,9 @@ function updateButtons() {
   const oy = adminState.openYear;
   const ph = adminState.gamePhase;
   document.getElementById("btnStart").disabled  = oy !== 0;
-  document.getElementById("btnNext").disabled   = oy === 0 || ph === "end";
-  document.getElementById("btnEnd").style.display = oy === 5 ? "inline-block" : "none";
-  document.getElementById("btnNext").textContent = oy === 5 ? "סיום ←" : "שנה הבאה ←";
+  document.getElementById("btnNext").disabled   = oy === 0 || oy === 5 || ph === "end";
+  document.getElementById("btnEnd").style.display = (oy === 5 && ph !== "end") ? "inline-block" : "none";
+  document.getElementById("btnNext").textContent = "שנה הבאה ←";
 }
 
 function refreshAdminView() {
@@ -190,9 +190,8 @@ async function openTrial() {
 async function openNextYear() {
   const oy = adminState.openYear;
   let nextYear, phase;
-  if (oy === -1)          { nextYear = 1; phase = "game"; }
-  else if (oy >= 1 && oy < 5) { nextYear = oy + 1; phase = "game"; }
-  else if (oy === 5)      { showEndView(); return; }
+  if (oy === -1)               { nextYear = 1; phase = "game"; }
+  else if (oy >= 1 && oy <= 4) { nextYear = oy + 1; phase = "game"; }
   else return;
 
   await apiPost(`/api/year?pass=${ADMIN_PASS}`, { year: nextYear, phase });

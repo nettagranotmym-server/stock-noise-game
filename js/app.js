@@ -256,7 +256,8 @@ async function confirmAlloc() {
   if (YEARS[S.yearIndex].isTrial) {
     showWaitingScreen(true); waitForRealGame();
   } else if (S.yearIndex >= 5) {
-    showResults();
+    // Year 5: wait for admin to click "end" before showing results
+    showWaitingScreen(false); waitForEnd();
   } else {
     showWaitingScreen(false); waitForNextYear();
   }
@@ -340,8 +341,32 @@ function waitForNextYear() {
       S.yearIndex  = nextIdx;
       S.done       = false;
       document.getElementById("gBal").textContent = fmt(S.totalValue);
-      if (S.yearIndex > 5) { showResults(); return; }
+      // If admin already ended the game, go straight to results
+      if (S.yearIndex > 5 || state.gamePhase === "end") { showResults(); return; }
       showAllocScreen();
+    }
+  }, 2500);
+}
+
+
+// ── Poll for game end (year 5) ────────────────
+async function waitForEnd() {
+  // Check immediately in case admin already ended
+  try {
+    const state = await apiGet("/api/year");
+    if (state.gamePhase === "end") { showResults(); return; }
+  } catch(e) {}
+
+  let dots = 0;
+  S._poll = setInterval(async () => {
+    dots = (dots + 1) % 4;
+    const el = document.getElementById("waitDots");
+    if (el) el.textContent = "●".repeat(dots + 1);
+    let state = { gamePhase: "" };
+    try { state = await apiGet("/api/year"); } catch(e) {}
+    if (state.gamePhase === "end") {
+      clearInterval(S._poll);
+      showResults();
     }
   }, 2500);
 }
