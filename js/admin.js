@@ -147,7 +147,7 @@ function buildYearCards(yi) {
             </div>
           </div>
           <div class="co-row-right">
-            <div class="co-row-price">&#x20AA;${d.price.toLocaleString("he-IL")}</div>
+            <div style="font-size:9px;color:var(--txt3);font-weight:700;text-align:left">מחיר מניה</div><div class="co-row-price">&#x20AA;${d.price.toLocaleString("he-IL")}</div>
             ${retHtml}
           </div>
         </div>
