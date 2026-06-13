@@ -318,8 +318,21 @@ function waitForNextYear() {
     dots = (dots + 1) % 4;
     const el = document.getElementById("waitDots");
     if (el) el.textContent = "●".repeat(dots + 1);
-    let state = { openYear: 0 };
+    let state = { openYear: 0, gamePhase: "" };
     try { state = await apiGet("/api/year"); } catch(e) {}
+
+    // Admin clicked "end"
+    if (state.gamePhase === "end") {
+      clearInterval(S._poll);
+      // Apply final year returns if not yet done
+      if (currentYearIdx < 5) {
+        S.totalValue = calcNewValue(S.totalValue, S.alloc, currentYearIdx, 5);
+        S.yearIndex  = 5;
+      }
+      showResults();
+      return;
+    }
+
     const nextIdx = currentYearIdx + 1;
     if (state.openYear >= nextIdx) {
       clearInterval(S._poll);
