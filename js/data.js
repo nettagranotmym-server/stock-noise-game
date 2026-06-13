@@ -45,28 +45,28 @@ const YEARS = [
     label: "שנת ניסיון", isTrial: true,
     nova:  { rev: "₪500M", profit: "₪-20M",  profitClass: "neg", news: "החברה מגדילה השקעות בפיתוח – המשקיעים חוששים מהרווחיות הנמוכה.", price: 500 },
     prime: { rev: "₪1.1B", profit: "₪220M",  profitClass: "pos", news: "החברה ממשיכה להציג יציבות ורווחיות גבוהה.", price: 5000 },
-    fast:  { rev: "₪700M", profit: "₪90M",   profitClass: "pos", news: "FastWave מכה את התחזיות והמניה מושכת עניין רב.", price: 800 },
+    fast:  { rev: "₪700M", profit: "₪350M",  profitClass: "pos", news: "FastWave מכה את התחזיות והמניה מושכת עניין רב.", price: 800 },
   },
   // Year 1
   {
     label: "שנה 1 מתוך 5", isTrial: false,
     nova:  { rev: "₪620M",  profit: "₪-10M", profitClass: "neg", news: "כותרות שליליות: החברה עדיין לא מצליחה להציג רווח משמעותי.", price: 480 },
     prime: { rev: "₪950M",  profit: "₪190M", profitClass: "pos", news: "החברה מעלה תחזית שנתית ומחלקת דיבידנד.", price: 5500 },
-    fast:  { rev: "₪880M",  profit: "₪130M", profitClass: "pos", news: "אנליסטים מעלים המלצות בעקבות צמיחה מהירה.", price: 960 },
+    fast:  { rev: "₪880M",  profit: "₪440M", profitClass: "pos", news: "אנליסטים מעלים המלצות בעקבות צמיחה מהירה.", price: 960 },
   },
   // Year 2
   {
     label: "שנה 2 מתוך 5", isTrial: false,
     nova:  { rev: "₪760M",  profit: "₪5M",   profitClass: "pos", news: "אנליסטים חלוקים: האם החברה יקרה מדי ביחס לרווחים?", price: 450 },
     prime: { rev: "₪1.0B",  profit: "₪200M", profitClass: "pos", news: "ביצועים עקביים, אך חלק מהאנליסטים טוענים שהמניה יקרה.", price: 6000 },
-    fast:  { rev: "₪1.05B", profit: "₪170M", profitClass: "pos", news: "החברה מציגה שיאים חדשים, אך מתחרים חדשים נכנסים לשוק.", price: 1150 },
+    fast:  { rev: "₪1.05B", profit: "₪525M", profitClass: "pos", news: "החברה מציגה שיאים חדשים, אך מתחרים חדשים נכנסים לשוק.", price: 1150 },
   },
   // Year 3
   {
     label: "שנה 3 מתוך 5", isTrial: false,
     nova:  { rev: "₪940M",  profit: "₪35M",  profitClass: "pos", news: "המוצר החדש מתחיל לצבור לקוחות, אך השוק עדיין סקפטי.", price: 530 },
     prime: { rev: "₪1.06B", profit: "₪210M", profitClass: "pos", news: "החברה ממשיכה לצמוח לאט אך בעקביות.", price: 6600 },
-    fast:  { rev: "₪980M",  profit: "₪80M",  profitClass: "pos", news: "סדקים ראשונים: ירידה ברווחיות בעקבות מלחמת מחירים.", price: 720 },
+    fast:  { rev: "₪980M",  profit: "₪490M", profitClass: "pos", news: "סדקים ראשונים: ירידה ברווחיות בעקבות מלחמת מחירים.", price: 720 },
   },
   // Year 4
   {
