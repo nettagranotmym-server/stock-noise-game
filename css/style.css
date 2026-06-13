@@ -634,3 +634,158 @@ input[type=range]::-moz-range-thumb {
 @media (max-width: 900px) {
   #yearCards { grid-template-columns: 1fr; }
 }
+
+/* =============================================
+   PLAYER SCREEN — larger fonts, no-scroll layout
+   ============================================= */
+
+/* Use viewport height to fit everything on one screen */
+#scrGame {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+#scrGame .gh {
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+#scrGame #gContent {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 4px;
+}
+
+/* Compact game header */
+#scrGame .gh {
+  padding: 6px 10px;
+  border-radius: 10px;
+  margin: 6px 0 4px;
+}
+#scrGame .gbv { font-size: 18px; }
+#scrGame .gbs { font-size: 10px; }
+#scrGame .gtn { font-size: 13px; }
+
+/* Year label */
+#scrGame .year-label {
+  font-size: 13px; font-weight: 800;
+  text-align: center; margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
+/* Practice banner */
+#scrGame .practice-badge {
+  font-size: 12px; padding: 5px 10px;
+  margin-bottom: 2px; flex-shrink: 0;
+}
+
+/* Company rows — bigger fonts, compact */
+#scrGame .co-rows-wrap {
+  flex-shrink: 0;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+#scrGame .co-row {
+  padding: 8px 10px;
+}
+
+#scrGame .co-row-icon {
+  width: 34px; height: 34px; font-size: 17px;
+}
+
+#scrGame .co-row-name {
+  font-size: 16px; font-weight: 800;
+}
+
+#scrGame .co-row-fins {
+  font-size: 13px; margin-top: 2px;
+}
+
+#scrGame .co-row-fins strong {
+  font-size: 14px;
+}
+
+#scrGame .co-row-price {
+  font-size: 16px; font-weight: 900;
+}
+
+#scrGame .ret-badge {
+  font-size: 13px; padding: 3px 8px;
+}
+
+/* Slider section — compact but readable */
+#scrGame .alc {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  margin-bottom: 2px;
+}
+
+#scrGame .alc-t {
+  font-size: 14px; margin-bottom: 6px;
+}
+
+#scrGame .sr {
+  margin-bottom: 6px;
+}
+
+#scrGame .sl {
+  font-size: 15px; font-weight: 700;
+}
+
+#scrGame .sli {
+  width: 26px; height: 26px; font-size: 14px;
+}
+
+#scrGame .sv {
+  font-size: 17px; font-weight: 900;
+}
+
+#scrGame .sm {
+  font-size: 12px;
+}
+
+#scrGame input[type=range] {
+  height: 7px;
+}
+
+#scrGame input[type=range]::-webkit-slider-thumb {
+  width: 26px; height: 26px;
+}
+
+#scrGame .aw {
+  font-size: 13px; padding: 6px;
+}
+
+/* Confirm button */
+#scrGame .cbtn {
+  flex-shrink: 0;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 900;
+  margin-top: 2px;
+}
+
+/* ── ADMIN — bigger fonts for projection ── */
+.admin-wrap { font-size: 15px; }
+.co-name    { font-size: 20px; }
+.co-story   { font-size: 14px; }
+.co-stat    { font-size: 14px; }
+.news-bar   { font-size: 15px; }
+.co-row-name { font-size: 17px; }
+.co-row-fins { font-size: 14px; }
+.co-row-price { font-size: 18px; }
+.ret-badge  { font-size: 14px; }
+.lb-name    { font-size: 14px; }
+.lb-value   { font-size: 20px; }
+.lb-pct     { font-size: 14px; }
+.p-emoji    { font-size: 22px; }
+.p-num      { font-size: 13px; }
+.p-val      { font-size: 12px; }
+.admin-year-badge { font-size: 18px; }

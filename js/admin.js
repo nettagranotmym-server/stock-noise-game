@@ -74,9 +74,9 @@ function refreshAdminView() {
 // ── Intro cards ───────────────────────────────
 function buildIntroCards() {
   const c = document.getElementById("introCards");
-  const moatLabels = ["","בינוני","טוב","חזק מאוד"];
+  const moatLabels = ["","בינוני","טוב","גבוה מאוד"];
   const mgmtLabels = ["","בינונית","טובה","גבוהה"];
-  const debtLabels = ["","גבוה","בינוני","נמוך"];
+  const debtLabels = ["","בינוני","טוב","מצוין"];
   const yr0 = YEARS[0]; // trial year data for initial financials
 
   c.innerHTML = COMPANIES.map(co => {
@@ -91,7 +91,7 @@ function buildIntroCards() {
       </div>
       <div class="co-stats" style="margin-top:10px">
         <div class="co-stat">
-          <span class="co-stat-label">חפיר תחרותי</span>
+          <span class="co-stat-label">יתרון תחרותי</span>
           ${dots(co.moat, 3, "var(--primary)")}
           <span style="font-size:11px;color:var(--txt3)">${moatLabels[co.moat]}</span>
         </div>
@@ -101,7 +101,7 @@ function buildIntroCards() {
           <span style="font-size:11px;color:var(--txt3)">${mgmtLabels[co.mgmt]}</span>
         </div>
         <div class="co-stat">
-          <span class="co-stat-label">מבנה חוב</span>
+          <span class="co-stat-label">חוזים עתידיים</span>
           ${dots(co.debt, 3, "var(--gold)")}
           <span style="font-size:11px;color:var(--txt3)">${debtLabels[co.debt]}</span>
         </div>
