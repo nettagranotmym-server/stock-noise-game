@@ -374,7 +374,11 @@ async function waitForEnd() {
 
 // ── Results ───────────────────────────────────
 function showResults() {
-  showSc("scrEnd");
+  // scrEnd is a fixed overlay outside .ct — handle separately
+  document.querySelectorAll(".sc").forEach(s => s.classList.remove("on"));
+  const endEl = document.getElementById("scrEnd");
+  endEl.style.display = "flex";
+  window.scrollTo(0, 0);
   const gain   = S.totalValue - STARTING_CASH;
   const pct    = (gain / STARTING_CASH * 100).toFixed(1);
   const isPos  = gain >= 0;
@@ -427,6 +431,9 @@ function showResults() {
 }
 
 function restart() {
+  // Hide the fixed end screen
+  const endEl = document.getElementById("scrEnd");
+  if (endEl) endEl.style.display = "none";
   clearInterval(S._poll);
   S = {
     playerId: null, playerName: null,

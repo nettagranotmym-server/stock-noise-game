@@ -57,9 +57,20 @@ function updateButtons() {
 
 function refreshAdminView() {
   const oy = adminState.openYear;
-  document.getElementById("adminIntroView").style.display = oy === 0 ? "block" : "none";
-  document.getElementById("adminYearView").style.display  = (oy === -1 || (oy >= 1 && oy <= 5)) ? "block" : "none";
-  document.getElementById("adminEndView").style.display   = adminState.gamePhase === "end" ? "block" : "none";
+  const showIntro = oy === 0;
+  const showYear  = oy === -1 || (oy >= 1 && oy <= 5);
+  const showEnd   = adminState.gamePhase === "end";
+
+  const iv = document.getElementById("adminIntroView");
+  const yv = document.getElementById("adminYearView");
+  const ev = document.getElementById("adminEndView");
+
+  iv.style.display = showIntro ? "flex" : "none";
+  yv.style.display = showYear  ? "flex" : "none";
+  ev.style.display = showEnd   ? "flex" : "none";
+
+  // All views fill their parent
+  [iv, yv, ev].forEach(el => { el.style.flex = "1"; el.style.flexDirection = "column"; el.style.minHeight = "0"; });
 
   if (oy === 0)                buildIntroCards();
   if (oy === -1)               buildYearCards(0);
