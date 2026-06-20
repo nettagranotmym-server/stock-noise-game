@@ -393,39 +393,61 @@ function showResults() {
   rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה כוללת`;
   rr.className   = `fr ${isPos ? "pos" : "neg"}`;
 
+  // Build P&L per company from history
   const coStats = {};
   COMPANIES.forEach(co => { coStats[co.id] = { invested: 0, received: 0 }; });
+
   S.history.forEach(h => {
     COMPANIES.forEach(co => {
       const tx = h.transactions[co.id] || 0;
-      if (tx > 0) coStats[co.id].invested += tx;
-      if (tx < 0) coStats[co.id].received += (-tx);
+      if (tx > 0) coStats[co.id].invested  += tx;
+      if (tx < 0) coStats[co.id].received  += (-tx);
     });
   });
+
+  // Add final portfolio value as "received"
   COMPANIES.forEach(co => {
-    coStats[co.id].received += S.totalValue * (S.alloc[co.id] || 0) / 100;
+    const finalPct = (S.alloc[co.id] || 0) / 100;
+    coStats[co.id].received += S.totalValue * finalPct;
   });
 
-  let det = `<div class="det-t">רווח / הפסד לפי חברה</div>`;
+  // If no history at all (edge case), show alloc %
+  const hasHistory = S.history.length > 0;
+
+  let det = `<div class="det-t" style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:8px">${hasHistory ? "רווח / הפסד לפי חברה" : "תמהיל סופי"}</div>`;
+
   COMPANIES.forEach(co => {
-    const { invested, received } = coStats[co.id];
-    if (invested === 0 && received === 0) return;
-    const plVal = received - invested;
-    const plPct = invested > 0 ? (plVal / invested * 100).toFixed(1) : "—";
-    const isUp  = plVal >= 0;
-    det += `
-      <div class="det-r">
-        <span>${co.icon} ${co.name}</span>
-        <div style="text-align:left">
-          <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:14px;color:${isUp ? "var(--green)" : "var(--red)"}">
-            ${isUp ? "+" : ""}${fmt(plVal)}
+    if (hasHistory) {
+      const { invested, received } = coStats[co.id];
+      const plVal = received - invested;
+      const plPct = invested > 0 ? (plVal / invested * 100).toFixed(1) : "0.0";
+      const isUp  = plVal >= 0;
+      det += `
+        <div class="det-r" style="font-size:15px;padding:10px 0">
+          <span style="font-weight:700">${co.icon} ${co.name}</span>
+          <div style="text-align:left">
+            <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:17px;color:${isUp ? "var(--green)" : "var(--red)"}">
+              ${isUp ? "+" : ""}${fmt(plVal)}
+            </div>
+            <div style="font-size:13px;font-weight:700;color:${isUp ? "var(--green)" : "var(--red)"}">
+              ${isUp ? "+" : ""}${plPct}%
+            </div>
           </div>
-          <div style="font-size:11px;color:${isUp ? "var(--green)" : "var(--red)"}">
-            ${isUp ? "+" : ""}${plPct}%
+        </div>`;
+    } else {
+      const pct = S.alloc[co.id] || 0;
+      const val = S.totalValue * pct / 100;
+      det += `
+        <div class="det-r" style="font-size:15px;padding:10px 0">
+          <span style="font-weight:700">${co.icon} ${co.name}</span>
+          <div style="text-align:left">
+            <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:17px;color:var(--primary)">${fmt(val)}</div>
+            <div style="font-size:13px;color:var(--txt3)">${pct}%</div>
           </div>
-        </div>
-      </div>`;
+        </div>`;
+    }
   });
+
   document.getElementById("endDetails").innerHTML = det;
   document.getElementById("endRestartBtn").addEventListener("click", restart);
 }

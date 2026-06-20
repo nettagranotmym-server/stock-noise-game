@@ -89,18 +89,38 @@ function buildIntroCards() {
     const d = yr0[co.id];
     return `
     <div class="co-card ${co.cardClass}">
-      <div class="co-name">${co.icon} ${co.name}</div>
-      <div class="co-story">${co.story}</div>
-      <div class="co-fins">
-        <div class="fin-box"><div class="fin-lbl">הכנסות</div><div class="fin-val">${d.rev}</div></div>
-        <div class="fin-box"><div class="fin-lbl">רווח</div><div class="fin-val ${d.profitClass}">${d.profit}</div></div>
+      <!-- שורה עליונה -->
+      <div class="yr-top-strip">
+        <div class="yr-name">${co.icon} ${co.name}</div>
+        <div class="yr-strip-right">
+          <div class="yr-fins-inline">
+            <span class="yr-fin-item">הכנסות <strong>${d.rev}</strong></span>
+            <span class="yr-fin-sep">·</span>
+            <span class="yr-fin-item ${d.profitClass}">רווח <strong>${d.profit}</strong></span>
+          </div>
+          <div class="yr-price-inline">
+            <span class="yr-price-lbl">מחיר מניה</span>
+            <span class="yr-price">₪${co.startPrice.toLocaleString("he-IL")}</span>
+          </div>
+        </div>
       </div>
-      <div class="co-stats">
-        <div class="co-stat"><span class="co-stat-label">יתרון תחרותי</span>${dots(co.moat,3,"var(--primary)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${moatLabels[co.moat]}</span></div>
-        <div class="co-stat"><span class="co-stat-label">יציבות הנהלה</span>${dots(co.mgmt,3,"var(--green)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${mgmtLabels[co.mgmt]}</span></div>
-        <div class="co-stat"><span class="co-stat-label">חוזים עתידיים</span>${dots(co.debt,3,"var(--gold)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${debtLabels[co.debt]}</span></div>
+      <!-- מרכז: סיפור החברה על רקע כהה -->
+      <div class="news-big">
+        <div class="news-big-label">על החברה</div>
+        <div class="news-big-headline">${co.name}</div>
+        <div class="news-big-body">${co.story}</div>
+        <div style="display:flex;gap:12px;margin-top:8px;flex-shrink:0">
+          <div style="color:rgba(255,255,255,.6);font-size:13px">
+            יתרון תחרותי: <span style="color:#f0c060;font-weight:800">${moatLabels[co.moat]}</span>
+          </div>
+          <div style="color:rgba(255,255,255,.6);font-size:13px">
+            יציבות הנהלה: <span style="color:#f0c060;font-weight:800">${mgmtLabels[co.mgmt]}</span>
+          </div>
+          <div style="color:rgba(255,255,255,.6);font-size:13px">
+            חוזים עתידיים: <span style="color:#f0c060;font-weight:800">${debtLabels[co.debt]}</span>
+          </div>
+        </div>
       </div>
-      <div class="co-price">מחיר מניה: ₪${co.startPrice.toLocaleString("he-IL")}</div>
     </div>`}).join("");
 }
 
