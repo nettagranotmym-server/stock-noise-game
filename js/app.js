@@ -355,7 +355,11 @@ async function waitForEnd() {
   // Check immediately in case admin already ended
   try {
     const state = await apiGet("/api/year");
-    if (state.gamePhase === "end") { showResults(); return; }
+    if (state.gamePhase === "end") {
+      applyFinalReturns();
+      showResults();
+      return;
+    }
   } catch(e) {}
 
   let dots = 0;
@@ -367,9 +371,20 @@ async function waitForEnd() {
     try { state = await apiGet("/api/year"); } catch(e) {}
     if (state.gamePhase === "end") {
       clearInterval(S._poll);
+      applyFinalReturns();
       showResults();
     }
   }, 2500);
+}
+
+// Calculate final year returns and record final transactions
+function applyFinalReturns() {
+  if (S.yearIndex < 5) return;
+  // Calculate new total value based on year 4→5 price changes
+  const prevYearIdx = 4; // year 4
+  const finalYearIdx = 5; // year 5
+  S.totalValue = calcNewValue(S.totalValue, S.alloc, prevYearIdx, finalYearIdx);
+  S.yearIndex  = 5;
 }
 
 // ── Results ───────────────────────────────────
@@ -393,59 +408,37 @@ function showResults() {
   rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה כוללת`;
   rr.className   = `fr ${isPos ? "pos" : "neg"}`;
 
-  // Build P&L per company from history
-  const coStats = {};
-  COMPANIES.forEach(co => { coStats[co.id] = { invested: 0, received: 0 }; });
+  // ── P&L per company ──
+  // Simple approach: compare start price vs end price × alloc held
+  // Use initial investment share vs final value share
+  const initialYear = YEARS[1]; // year 1 start prices
+  const finalYear   = YEARS[5]; // year 5 end prices
 
-  S.history.forEach(h => {
-    COMPANIES.forEach(co => {
-      const tx = h.transactions[co.id] || 0;
-      if (tx > 0) coStats[co.id].invested  += tx;
-      if (tx < 0) coStats[co.id].received  += (-tx);
-    });
-  });
-
-  // Add final portfolio value as "received"
-  COMPANIES.forEach(co => {
-    const finalPct = (S.alloc[co.id] || 0) / 100;
-    coStats[co.id].received += S.totalValue * finalPct;
-  });
-
-  // If no history at all (edge case), show alloc %
-  const hasHistory = S.history.length > 0;
-
-  let det = `<div class="det-t" style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:8px">${hasHistory ? "רווח / הפסד לפי חברה" : "תמהיל סופי"}</div>`;
+  let det = `<div style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--brd)">ביצועי החברות</div>`;
 
   COMPANIES.forEach(co => {
-    if (hasHistory) {
-      const { invested, received } = coStats[co.id];
-      const plVal = received - invested;
-      const plPct = invested > 0 ? (plVal / invested * 100).toFixed(1) : "0.0";
-      const isUp  = plVal >= 0;
-      det += `
-        <div class="det-r" style="font-size:15px;padding:10px 0">
-          <span style="font-weight:700">${co.icon} ${co.name}</span>
-          <div style="text-align:left">
-            <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:17px;color:${isUp ? "var(--green)" : "var(--red)"}">
-              ${isUp ? "+" : ""}${fmt(plVal)}
-            </div>
-            <div style="font-size:13px;font-weight:700;color:${isUp ? "var(--green)" : "var(--red)"}">
-              ${isUp ? "+" : ""}${plPct}%
-            </div>
+    const startPrice = initialYear[co.id].price;
+    const endPrice   = finalYear[co.id].price;
+    const change     = ((endPrice - startPrice) / startPrice * 100).toFixed(1);
+    const isUp       = endPrice >= startPrice;
+
+    // How much of final portfolio is in this company
+    const finalPct = S.alloc[co.id] || 0;
+    const finalVal = S.totalValue * finalPct / 100;
+
+    det += `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
+        <div>
+          <div style="font-size:15px;font-weight:700">${co.icon} ${co.name}</div>
+          <div style="font-size:12px;color:var(--txt3);margin-top:2px">תמהיל סופי: ${finalPct}%</div>
+        </div>
+        <div style="text-align:left">
+          <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:18px;color:${isUp ? "var(--green)" : "var(--red)"}">
+            ${isUp ? "+" : ""}${change}%
           </div>
-        </div>`;
-    } else {
-      const pct = S.alloc[co.id] || 0;
-      const val = S.totalValue * pct / 100;
-      det += `
-        <div class="det-r" style="font-size:15px;padding:10px 0">
-          <span style="font-weight:700">${co.icon} ${co.name}</span>
-          <div style="text-align:left">
-            <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:17px;color:var(--primary)">${fmt(val)}</div>
-            <div style="font-size:13px;color:var(--txt3)">${pct}%</div>
-          </div>
-        </div>`;
-    }
+          <div style="font-size:11px;color:var(--txt3)">מתחילת המשחק</div>
+        </div>
+      </div>`;
   });
 
   document.getElementById("endDetails").innerHTML = det;
@@ -467,4 +460,4 @@ function restart() {
   document.getElementById("startBtn").classList.remove("en");
   renderPlayerGrid();
   showSc("scrLogin");
-}
+} 
