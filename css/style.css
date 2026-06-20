@@ -818,3 +818,6 @@ input[type=range]::-moz-range-thumb {
   transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.15);
 }
 .shevyon-btn:hover { background: var(--card2); transform: translateY(-1px); }
+
+/* ── End screen ── */
+#scrEnd { flex-direction: column; overflow-y: auto; padding-bottom: 20px; }

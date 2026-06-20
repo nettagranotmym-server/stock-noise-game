@@ -280,11 +280,12 @@ function showWaitingScreen(isTrial) {
       <span class="sum-total">${fmt(tv)}</span>
     </div>`;
 
+  const isYear5 = S.yearIndex >= 5;
   document.getElementById("gContent").innerHTML = `
     <div class="wait-screen">
       <div class="wait-avatar">${PLAYER_EMOJIS[S.playerId - 1]}</div>
       <div class="wait-title">סיימתי! ממתינים... ✓</div>
-      <div class="wait-sub">${isTrial ? "המנהלת תפתח את המשחק האמיתי בקרוב" : "המנהלת תפתח את השנה הבאה בקרוב"}</div>
+      <div class="wait-sub">${isTrial ? "המנהלת תפתח את המשחק האמיתי בקרוב" : isYear5 ? "ממתינים לסיום המשחק על ידי המנהלת" : "המנהלת תפתח את השנה הבאה בקרוב"}</div>
       <div class="wait-summary">${summaryHtml}</div>
       <div class="dots-loader" id="waitDots">●</div>
     </div>`;
