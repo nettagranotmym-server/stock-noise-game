@@ -94,32 +94,34 @@
 </div>
 
 <!-- מסך סיום — FIXED fullscreen, מחוץ ל-.ct -->
-<div id="scrEnd" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;overflow-y:auto;flex-direction:column;padding:20px 16px 30px;">
-  <div class="rh" style="padding-top:10px">
-    <div style="font-size:52px;margin-bottom:8px" id="endTrophy">🏆</div>
-    <div class="rtt">המשחק הסתיים!</div>
-    <div class="rts" id="endTeam"></div>
-  </div>
-  <div class="fc" style="margin-top:12px">
+<div id="scrEnd" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;flex-direction:column;padding:12px 14px 14px;gap:8px;overflow:hidden;">
+
+  <!-- Header: name + value -->
+  <div style="background:white;border-radius:12px;padding:14px;border:1px solid var(--brd);box-shadow:0 2px 8px var(--shadow);text-align:center">
+    <div class="rtt" style="font-size:20px">המשחק הסתיים!</div>
+    <div class="rts" id="endTeam" style="margin:4px 0 8px"></div>
     <div class="fl">שווי תיק סופי</div>
-    <div class="fa" id="endAmount"></div>
-    <div class="fr" id="endReturn"></div>
+    <div class="fa" id="endAmount" style="font-size:28px"></div>
+    <div class="fr" id="endReturn" style="font-size:15px;margin-top:3px"></div>
   </div>
-  <div class="det" style="margin-top:12px" id="endDetails"></div>
-  <div class="shevyon-promo" style="margin-top:12px">
-    <div class="shevyon-logo">SHE<span>vyon</span></div>
-    <div class="shevyon-title">הגיע הזמן לשנות את זה</div>
-    <div class="shevyon-text">
-      רוב הנשים לא מנהלות את הכסף שלהן — ויש לזה סיבות.
-      SHEvyon מביאה לארגון שלך סדנאות פרקטיות שגורמות לנשות הארגון
-      להבין פיננסים, לקבל החלטות בביטחון ולצמוח כלכלית.
+
+  <!-- P&L per company -->
+  <div class="det" id="endDetails" style="flex:1;min-height:0;overflow:hidden"></div>
+
+  <!-- SHEvyon promo compact -->
+  <div class="shevyon-promo" style="padding:14px;gap:8px">
+    <div class="shevyon-logo" style="font-size:18px">SHE<span>vyon</span></div>
+    <div class="shevyon-title" style="font-size:15px">הגיע הזמן לשנות את זה</div>
+    <div class="shevyon-text" style="font-size:12px;line-height:1.5">
+      SHEvyon מביאה לארגון שלך סדנאות שגורמות לנשות הארגון להבין פיננסים ולצמוח כלכלית.
     </div>
-    <a href="https://www.shevyon.com/invest-at-work" target="_blank" class="shevyon-btn">
+    <a href="https://www.shevyon.com/invest-at-work" target="_blank" class="shevyon-btn" style="padding:10px;font-size:14px">
       רוצה להביא את זה לארגון שלך? ←
     </a>
   </div>
-  <div style="text-align:center;margin-top:12px">
-    <button class="rbtn" id="endRestartBtn">שחק/י שוב 🔄</button>
+
+  <div style="text-align:center">
+    <button class="rbtn" id="endRestartBtn" style="padding:10px;font-size:13px">שחק/י שוב 🔄</button>
   </div>
 </div>
 <script src="js/data.js"></script>

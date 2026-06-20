@@ -226,6 +226,45 @@
     }
     .shevyon-strip-sub { font-size:12px; color:rgba(255,255,255,.7); }
     .shevyon-strip-url { font-size:11px; color:rgba(255,255,255,.5); margin-top:2px; }
+
+    /* ── Big news block ── */
+    .news-big {
+      flex: 1;
+      background: linear-gradient(135deg, #ede9fe, #fce7f3);
+      border: 2px solid var(--brd2);
+      border-radius: 10px;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      min-height: 0;
+    }
+    .news-big-label {
+      font-size: 11px; font-weight: 800; color: var(--txt3);
+      letter-spacing: .5px; text-transform: uppercase;
+    }
+    .news-big-text {
+      font-size: 17px; font-weight: 700; color: var(--txt);
+      line-height: 1.5;
+    }
+
+    /* ── Players strip: 4x taller ── */
+    .players-strip {
+      min-height: 120px !important;
+      align-items: flex-start !important;
+      padding: 10px 12px !important;
+    }
+    .pgrid {
+      align-content: start;
+      height: 100%;
+    }
+    .ptile {
+      padding: 8px 4px 6px !important;
+    }
+    .pt-emoji { font-size: 18px !important; margin-bottom: 3px !important; }
+    .pt-num   { font-size: 11px !important; }
+    .pt-val   { font-size: 10px !important; margin-top: 2px !important; }
   </style>
 </head>
 <body>
