@@ -389,61 +389,53 @@ function applyFinalReturns() {
 
 // ── Results ───────────────────────────────────
 function showResults() {
-  // scrEnd is a fixed overlay outside .ct — handle separately
-  document.querySelectorAll(".sc").forEach(s => s.classList.remove("on"));
   const endEl = document.getElementById("scrEnd");
-  endEl.style.display = "flex";
+  document.querySelectorAll(".sc").forEach(s => s.classList.remove("on"));
+  endEl.style.display = "block";
   window.scrollTo(0, 0);
-  const gain   = S.totalValue - STARTING_CASH;
-  const pct    = (gain / STARTING_CASH * 100).toFixed(1);
-  const isPos  = gain >= 0;
-  const trophy = S.totalValue >= STARTING_CASH * 1.8 ? "🏆" :
-                 S.totalValue >= STARTING_CASH * 1.3 ? "🥈" :
-                 S.totalValue >= STARTING_CASH        ? "🌱" : "📉";
 
-  document.getElementById("endTeam").textContent   = `${PLAYER_EMOJIS[S.playerId - 1]} שחקנ/ית ${S.playerId}`;
+  // Team name
+  document.getElementById("endTeam").textContent =
+    PLAYER_EMOJIS[S.playerId - 1] + " שחקנ/ית " + S.playerId;
+
+  // Total value + return
+  const gain  = S.totalValue - STARTING_CASH;
+  const pct   = (gain / STARTING_CASH * 100).toFixed(1);
+  const isPos = gain >= 0;
   document.getElementById("endAmount").textContent = fmt(S.totalValue);
-  document.getElementById("endTrophy").textContent = trophy;
-  const rr = document.getElementById("endReturn");
-  rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה כוללת`;
-  rr.className   = `fr ${isPos ? "pos" : "neg"}`;
+  const retEl = document.getElementById("endReturn");
+  retEl.textContent = (isPos ? "+" : "") + pct + "% תשואה כוללת";
+  retEl.style.color = isPos ? "#059669" : "#dc2626";
 
-  // ── P&L per company ──
-  // Simple approach: compare start price vs end price × alloc held
-  // Use initial investment share vs final value share
-  const initialYear = YEARS[1]; // year 1 start prices
-  const finalYear   = YEARS[5]; // year 5 end prices
-
-  let det = `<div style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--brd)">ביצועי החברות</div>`;
+  // Company performance: start price (year 1) vs end price (year 5)
+  const yr1 = YEARS[1];
+  const yr5 = YEARS[5];
+  let html = "";
 
   COMPANIES.forEach(co => {
-    const startPrice = initialYear[co.id].price;
-    const endPrice   = finalYear[co.id].price;
-    const change     = ((endPrice - startPrice) / startPrice * 100).toFixed(1);
-    const isUp       = endPrice >= startPrice;
-
-    // How much of final portfolio is in this company
+    const p1  = yr1[co.id].price;
+    const p5  = yr5[co.id].price;
+    const chg = ((p5 - p1) / p1 * 100).toFixed(1);
+    const up  = p5 >= p1;
     const finalPct = S.alloc[co.id] || 0;
-    const finalVal = S.totalValue * finalPct / 100;
 
-    det += `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)">
-        <div>
-          <div style="font-size:15px;font-weight:700">${co.icon} ${co.name}</div>
-          <div style="font-size:12px;color:var(--txt3);margin-top:2px">תמהיל סופי: ${finalPct}%</div>
-        </div>
-        <div style="text-align:left">
-          <div style="font-family:'Rubik',sans-serif;font-weight:900;font-size:18px;color:${isUp ? "var(--green)" : "var(--red)"}">
-            ${isUp ? "+" : ""}${change}%
-          </div>
-          <div style="font-size:11px;color:var(--txt3)">מתחילת המשחק</div>
-        </div>
-      </div>`;
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5d9ff">' +
+      '<div>' +
+        '<div style="font-size:15px;font-weight:700;color:#1e1035">' + co.icon + ' ' + co.name + '</div>' +
+        '<div style="font-size:12px;color:#7c6fa8;margin-top:2px">תמהיל סופי: ' + finalPct + '%</div>' +
+      '</div>' +
+      '<div style="text-align:left">' +
+        '<div style="font-family:Rubik,sans-serif;font-weight:900;font-size:20px;color:' + (up ? "#059669" : "#dc2626") + '">' +
+          (up ? "+" : "") + chg + '%' +
+        '</div>' +
+        '<div style="font-size:11px;color:#7c6fa8">מתחילת המשחק</div>' +
+      '</div>' +
+    '</div>';
   });
 
-  document.getElementById("endDetails").innerHTML = det;
-  document.getElementById("endRestartBtn").addEventListener("click", restart);
+  document.getElementById("endDetails").innerHTML = html;
 }
+
 
 function restart() {
   // Hide the fixed end screen
@@ -460,4 +452,4 @@ function restart() {
   document.getElementById("startBtn").classList.remove("en");
   renderPlayerGrid();
   showSc("scrLogin");
-} 
+}
