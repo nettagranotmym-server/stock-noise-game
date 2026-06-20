@@ -4,11 +4,7 @@
 
 const ADMIN_PASS = "8114";
 
-let adminState = {
-  openYear:  0,
-  gamePhase: "intro",
-  _poll:     null,
-};
+let adminState = { openYear: 0, gamePhase: "intro", _poll: null };
 
 (async function initAdmin() {
   bindButtons();
@@ -47,8 +43,7 @@ function updateYearBadge() {
   else if (oy >= 1 && oy <= 5) label = YEARS[oy].label;
   else if (adminState.gamePhase === "end") label = "סיום המשחק 🏁";
   document.getElementById("yearBadge").textContent = label;
-  const pilot = document.getElementById("pilotBadge");
-  pilot.style.display = oy === -1 ? "inline-block" : "none";
+  document.getElementById("pilotBadge").style.display = oy === -1 ? "inline-block" : "none";
 }
 
 function updateButtons() {
@@ -77,7 +72,7 @@ function buildIntroCards() {
   const moatLabels = ["","בינוני","טוב","גבוה מאוד"];
   const mgmtLabels = ["","בינונית","טובה","גבוהה"];
   const debtLabels = ["","בינוני","טוב","מצוין"];
-  const yr0 = YEARS[0]; // trial year data for initial financials
+  const yr0 = YEARS[0];
 
   c.innerHTML = COMPANIES.map(co => {
     const d = yr0[co.id];
@@ -85,26 +80,14 @@ function buildIntroCards() {
     <div class="co-card ${co.cardClass}">
       <div class="co-name">${co.icon} ${co.name}</div>
       <div class="co-story">${co.story}</div>
-      <div class="co-fins-intro">
+      <div class="co-fins">
         <div class="fin-box"><div class="fin-lbl">הכנסות</div><div class="fin-val">${d.rev}</div></div>
         <div class="fin-box"><div class="fin-lbl">רווח</div><div class="fin-val ${d.profitClass}">${d.profit}</div></div>
       </div>
-      <div class="co-stats" style="margin-top:10px">
-        <div class="co-stat">
-          <span class="co-stat-label">יתרון תחרותי</span>
-          ${dots(co.moat, 3, "var(--primary)")}
-          <span style="font-size:11px;color:var(--txt3)">${moatLabels[co.moat]}</span>
-        </div>
-        <div class="co-stat">
-          <span class="co-stat-label">יציבות הנהלה</span>
-          ${dots(co.mgmt, 3, "var(--green)")}
-          <span style="font-size:11px;color:var(--txt3)">${mgmtLabels[co.mgmt]}</span>
-        </div>
-        <div class="co-stat">
-          <span class="co-stat-label">חוזים עתידיים</span>
-          ${dots(co.debt, 3, "var(--gold)")}
-          <span style="font-size:11px;color:var(--txt3)">${debtLabels[co.debt]}</span>
-        </div>
+      <div class="co-stats">
+        <div class="co-stat"><span class="co-stat-label">יתרון תחרותי</span>${dots(co.moat,3,"var(--primary)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${moatLabels[co.moat]}</span></div>
+        <div class="co-stat"><span class="co-stat-label">יציבות הנהלה</span>${dots(co.mgmt,3,"var(--green)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${mgmtLabels[co.mgmt]}</span></div>
+        <div class="co-stat"><span class="co-stat-label">חוזים עתידיים</span>${dots(co.debt,3,"var(--gold)")}<span style="font-size:12px;color:var(--txt3);margin-right:6px">${debtLabels[co.debt]}</span></div>
       </div>
       <div class="co-price">מחיר מניה: ₪${co.startPrice.toLocaleString("he-IL")}</div>
     </div>`}).join("");
@@ -113,7 +96,7 @@ function buildIntroCards() {
 function dots(filled, total, color) {
   let h = '<div class="rating-dots">';
   for (let i = 0; i < total; i++)
-    h += `<div class="dot${i < filled ? " filled" : ""}" style="${i < filled ? "background:" + color : ""}"></div>`;
+    h += `<div class="dot${i < filled ? " filled" : ""}" style="${i < filled ? "background:"+color : ""}"></div>`;
   return h + "</div>";
 }
 
@@ -133,33 +116,27 @@ function buildYearCards(yi) {
       retHtml = `<span class="ret-badge ${cls}">${pct > 0 ? "+" : ""}${pct}%</span>`;
     }
     return `
-      <div class="admin-co-block">
-        <div class="co-row" style="border-radius:10px 10px 0 0;border-bottom:none">
-          <div class="co-row-left">
-            <span class="co-row-icon" style="background:${co.bg};color:${co.color};width:36px;height:36px;font-size:18px">${co.icon}</span>
-            <div class="co-row-info">
-              <div class="co-row-name" style="font-size:16px">${co.name}</div>
-              <div class="co-row-fins">
-                <span class="co-fin-item">הכנסות <strong>${d.rev}</strong></span>
-                <span class="co-fin-sep">·</span>
-                <span class="co-fin-item ${d.profitClass}">רווח <strong>${d.profit}</strong></span>
-              </div>
-            </div>
-          </div>
-          <div class="co-row-right">
-            <div style="font-size:9px;color:var(--txt3);font-weight:700;text-align:left">מחיר מניה</div><div class="co-row-price">&#x20AA;${d.price.toLocaleString("he-IL")}</div>
+      <div class="yr-card">
+        <div class="yr-header">
+          <div class="yr-name">${co.icon} ${co.name}</div>
+          <div class="yr-price-block">
+            <div class="yr-price-lbl">מחיר מניה</div>
+            <div class="yr-price">₪${d.price.toLocaleString("he-IL")}</div>
             ${retHtml}
           </div>
         </div>
-        <div class="admin-news-row">
-          <span class="news-tag">ידיעה מהעיתונות</span>
-          📰 ${d.news}
+        <div>
+          <div class="news-label">ידיעה מהעיתונות</div>
+          <div class="news-bar">📰 ${d.news}</div>
         </div>
-      </div>`;
-  }).join("");
+        <div class="co-fins">
+          <div class="fin-box"><div class="fin-lbl">הכנסות</div><div class="fin-val">${d.rev}</div></div>
+          <div class="fin-box"><div class="fin-lbl">רווח</div><div class="fin-val ${d.profitClass}">${d.profit}</div></div>
+        </div>
+      </div>`}).join("");
 }
 
-// ── Players grid ──────────────────────────────
+// ── Players ───────────────────────────────────
 async function refreshPlayers() {
   let players = [];
   try { players = await apiGet("/api/players"); } catch(e) {}
@@ -168,15 +145,10 @@ async function refreshPlayers() {
     const tile = document.getElementById(`ptile-${i}`);
     if (!tile) continue;
     const p = players.find(x => x.id === i);
-    if (!p) {
-      tile.className = "p-tile empty";
-      tile.querySelector(".p-emoji").textContent = "○";
-      tile.querySelector(".p-val").textContent   = "";
-      continue;
-    }
-    tile.className = `p-tile ${p.done ? "waiting" : "active"}`;
-    tile.querySelector(".p-emoji").textContent = PLAYER_EMOJIS[i - 1];
-    tile.querySelector(".p-val").textContent   = fmt(p.totalValue || STARTING_CASH);
+    if (!p) { tile.className = "ptile empty"; tile.querySelector(".pt-emoji").textContent = "○"; tile.querySelector(".pt-val").textContent = ""; continue; }
+    tile.className = `ptile ${p.done ? "waiting" : "active"}`;
+    tile.querySelector(".pt-emoji").textContent = PLAYER_EMOJIS[i - 1];
+    tile.querySelector(".pt-val").textContent   = fmt(p.totalValue || STARTING_CASH);
   }
 }
 
@@ -203,31 +175,32 @@ async function openNextYear() {
 async function showEndView() {
   await apiPost(`/api/year?pass=${ADMIN_PASS}`, { year: 5, phase: "end" });
   adminState.gamePhase = "end";
-  document.getElementById("adminIntroView").style.display = "none";
-  document.getElementById("adminYearView").style.display  = "none";
-  document.getElementById("adminEndView").style.display   = "block";
-  document.getElementById("yearBadge").textContent        = "סיום המשחק 🏁";
-  document.getElementById("btnNext").disabled             = true;
-  document.getElementById("btnEnd").style.display         = "none";
+  document.getElementById("adminYearView").style.display = "none";
+  document.getElementById("adminEndView").style.display  = "block";
+  document.getElementById("yearBadge").textContent       = "סיום המשחק 🏁";
+  document.getElementById("btnNext").disabled            = true;
+  document.getElementById("btnEnd").style.display        = "none";
   await buildLeaderboard();
 }
 
 async function buildLeaderboard() {
   let players = [];
   try { players = await apiGet("/api/players"); } catch(e) {}
-  const sorted = players.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
+  const sorted = players.sort((a,b) => (b.totalValue||0) - (a.totalValue||0));
+  const top3   = sorted.slice(0, 3);
   const medals = ["🥇","🥈","🥉"];
-  document.getElementById("leaderboard").innerHTML = sorted.map((p, i) => {
+
+  document.getElementById("leaderboard").innerHTML = top3.map((p, i) => {
     const val = p.totalValue || STARTING_CASH;
     const pct = ((val - STARTING_CASH) / STARTING_CASH * 100).toFixed(1);
     const pos = val >= STARTING_CASH;
     return `
-      <div class="lb-card ${i < 3 ? "r" + (i + 1) : ""}">
-        <div class="lb-rank">${medals[i] || "#" + (i + 1)}</div>
-        <div class="lb-emoji">${PLAYER_EMOJIS[p.id - 1]}</div>
-        <div class="lb-name">שחקנ/ית ${p.id}</div>
-        <div class="lb-value">${fmt(val)}</div>
-        <div class="lb-pct ${pos ? "pos" : "neg"}">${pos ? "+" : ""}${pct}%</div>
+      <div class="podium-card r${i+1}">
+        <div class="podium-medal">${medals[i]}</div>
+        <div class="podium-emoji">${PLAYER_EMOJIS[p.id - 1]}</div>
+        <div class="podium-name">שחקנ/ית ${p.id}</div>
+        <div class="podium-val">${fmt(val)}</div>
+        <div class="podium-pct ${pos ? "pos" : "neg"}">${pos ? "+" : ""}${pct}%</div>
       </div>`;
   }).join("");
 }

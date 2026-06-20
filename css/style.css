@@ -789,3 +789,32 @@ input[type=range]::-moz-range-thumb {
 .p-num      { font-size: 13px; }
 .p-val      { font-size: 12px; }
 .admin-year-badge { font-size: 18px; }
+
+/* ── SHEvyon promo card ── */
+.shevyon-promo {
+  background: linear-gradient(135deg, var(--primary), var(--pink));
+  border-radius: 16px; padding: 20px;
+  display: flex; flex-direction: column; gap: 10px; text-align: center;
+}
+
+.shevyon-logo {
+  font-family: 'Rubik', sans-serif; font-size: 22px; font-weight: 900;
+  color: white; letter-spacing: -1px;
+}
+.shevyon-logo span { opacity: .75; }
+
+.shevyon-title {
+  font-family: 'Rubik', sans-serif; font-size: 18px; font-weight: 900; color: white;
+}
+
+.shevyon-text {
+  font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.6;
+}
+
+.shevyon-btn {
+  display: block; background: white; color: var(--primary);
+  font-family: 'Rubik', sans-serif; font-size: 15px; font-weight: 800;
+  padding: 13px 20px; border-radius: 10px; text-decoration: none;
+  transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.15);
+}
+.shevyon-btn:hover { background: var(--card2); transform: translateY(-1px); }

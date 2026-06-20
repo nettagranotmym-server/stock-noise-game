@@ -373,7 +373,7 @@ async function waitForEnd() {
 
 // ── Results ───────────────────────────────────
 function showResults() {
-  showSc("scrResults");
+  showSc("scrEnd");
   const gain   = S.totalValue - STARTING_CASH;
   const pct    = (gain / STARTING_CASH * 100).toFixed(1);
   const isPos  = gain >= 0;
@@ -381,10 +381,10 @@ function showResults() {
                  S.totalValue >= STARTING_CASH * 1.3 ? "🥈" :
                  S.totalValue >= STARTING_CASH        ? "🌱" : "📉";
 
-  document.getElementById("rTeam").textContent   = `${PLAYER_EMOJIS[S.playerId - 1]} שחקנ/ית ${S.playerId}`;
-  document.getElementById("rAmount").textContent = fmt(S.totalValue);
-  document.getElementById("rTrophy").textContent = trophy;
-  const rr = document.getElementById("rReturn");
+  document.getElementById("endTeam").textContent   = `${PLAYER_EMOJIS[S.playerId - 1]} שחקנ/ית ${S.playerId}`;
+  document.getElementById("endAmount").textContent = fmt(S.totalValue);
+  document.getElementById("endTrophy").textContent = trophy;
+  const rr = document.getElementById("endReturn");
   rr.textContent = `${isPos ? "+" : ""}${pct}% תשואה כוללת`;
   rr.className   = `fr ${isPos ? "pos" : "neg"}`;
 
@@ -421,8 +421,8 @@ function showResults() {
         </div>
       </div>`;
   });
-  document.getElementById("rDetails").innerHTML = det;
-  document.getElementById("restartBtn").addEventListener("click", restart);
+  document.getElementById("endDetails").innerHTML = det;
+  document.getElementById("endRestartBtn").addEventListener("click", restart);
 }
 
 function restart() {
