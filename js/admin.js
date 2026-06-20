@@ -128,23 +128,30 @@ function buildYearCards(yi) {
     }
     return `
       <div class="yr-card">
-        <div class="yr-header">
+        <!-- שורה עליונה: שם + מחיר + נתונים -->
+        <div class="yr-top-strip">
           <div class="yr-name">${co.icon} ${co.name}</div>
-          <div class="yr-price-block">
-            <div class="yr-price-lbl">מחיר מניה</div>
-            <div class="yr-price">₪${d.price.toLocaleString("he-IL")}</div>
-            ${retHtml}
+          <div class="yr-strip-right">
+            <div class="yr-fins-inline">
+              <span class="yr-fin-item">הכנסות <strong>${d.rev}</strong></span>
+              <span class="yr-fin-sep">·</span>
+              <span class="yr-fin-item ${d.profitClass}">רווח <strong>${d.profit}</strong></span>
+            </div>
+            <div class="yr-price-inline">
+              <span class="yr-price-lbl">מחיר מניה</span>
+              <span class="yr-price">₪${d.price.toLocaleString("he-IL")}</span>
+              ${retHtml}
+            </div>
           </div>
         </div>
-        <div>
-          <div class="news-label">ידיעה מהעיתונות</div>
-          <div class="news-bar">📰 ${d.news}</div>
+        <!-- ידיעה: מרכז המסך -->
+        <div class="news-big">
+          <div class="news-big-label">📰 ידיעה מהעיתונות</div>
+          <div class="news-big-headline">${d.headline}</div>
+          <div class="news-big-body">${d.body}</div>
         </div>
-        <div class="co-fins">
-          <div class="fin-box"><div class="fin-lbl">הכנסות</div><div class="fin-val">${d.rev}</div></div>
-          <div class="fin-box"><div class="fin-lbl">רווח</div><div class="fin-val ${d.profitClass}">${d.profit}</div></div>
-        </div>
-      </div>`}).join("");
+      </div>`;
+  }).join("");
 }
 
 // ── Players ───────────────────────────────────
