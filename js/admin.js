@@ -224,9 +224,21 @@ async function showEndView() {
 async function buildLeaderboard() {
   let players = [];
   try { players = await apiGet("/api/players"); } catch(e) {}
-  const sorted = players.sort((a,b) => (b.totalValue||0) - (a.totalValue||0));
+
+  // Filter only players who actually joined (have a totalValue)
+  const active = players.filter(p => p && p.totalValue > 0);
+
+  // Sort by totalValue descending
+  const sorted = active.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
+
+  // Take top 3
   const top3   = sorted.slice(0, 3);
   const medals = ["🥇","🥈","🥉"];
+
+  if (top3.length === 0) {
+    document.getElementById("leaderboard").innerHTML = '<div style="color:var(--txt3);text-align:center;padding:20px">אין שחקנים עדיין</div>';
+    return;
+  }
 
   document.getElementById("leaderboard").innerHTML = top3.map((p, i) => {
     const val = p.totalValue || STARTING_CASH;
@@ -235,7 +247,7 @@ async function buildLeaderboard() {
     return `
       <div class="podium-card r${i+1}">
         <div class="podium-medal">${medals[i]}</div>
-        <div class="podium-emoji">${PLAYER_EMOJIS[p.id - 1]}</div>
+        <div class="podium-emoji">${PLAYER_EMOJIS[(p.id - 1) % PLAYER_EMOJIS.length]}</div>
         <div class="podium-name">שחקנ/ית ${p.id}</div>
         <div class="podium-val">${fmt(val)}</div>
         <div class="podium-pct ${pos ? "pos" : "neg"}">${pos ? "+" : ""}${pct}%</div>

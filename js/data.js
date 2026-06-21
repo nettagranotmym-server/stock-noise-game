@@ -169,12 +169,20 @@ function calcNewValue(totalValue, alloc, fromYearIdx, toYearIdx) {
   const from = YEARS[fromYearIdx];
   const to   = YEARS[toYearIdx];
   let newTotal = 0;
+  let totalPct = 0;
   COMPANIES.forEach(co => {
-    const pct    = (alloc[co.id] || 0) / 100;
-    const amount = totalValue * pct;
-    const ret    = (to[co.id].price - from[co.id].price) / from[co.id].price;
-    newTotal    += amount * (1 + ret);
+    const pct = Math.max(0, Math.min(100, alloc[co.id] || 0)) / 100;
+    totalPct += pct;
+    const amount    = totalValue * pct;
+    const fromPrice = from[co.id].price;
+    const toPrice   = to[co.id].price;
+    if (fromPrice <= 0) { newTotal += amount; return; }
+    const ret = (toPrice - fromPrice) / fromPrice;
+    newTotal += amount * (1 + ret);
   });
+  // If alloc doesn't add to 100%, remaining stays as cash
+  const cashPct = Math.max(0, 1 - totalPct);
+  newTotal += totalValue * cashPct;
   return Math.round(newTotal);
 }
 
@@ -195,4 +203,4 @@ async function apiPost(path, body) {
 async function apiDelete(path) {
   const res = await fetch(API_BASE + path, { method: "DELETE" });
   return res.json();
-} 
+}

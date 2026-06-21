@@ -5,7 +5,7 @@
 let S = {
   playerId:   null,
   playerName: null,
-  alloc:      { nova: 34, prime: 33, fast: 33 },
+  alloc:      { nova: 35, prime: 35, fast: 30 },
   prevAlloc:  null,
   totalValue: STARTING_CASH,
   yearIndex:  0,
@@ -89,7 +89,7 @@ async function joinGame() {
   } catch(e) { alert("שגיאת חיבור לשרת"); return; }
 
   S.totalValue = STARTING_CASH;
-  S.alloc      = { nova: 34, prime: 33, fast: 33 };
+  S.alloc      = { nova: 35, prime: 35, fast: 30 };
   S.prevAlloc  = null;
   S.history    = [];
   S.done       = false;
@@ -180,7 +180,7 @@ function showAllocScreen() {
         </div>
       </div>
       <input type="range" class="alloc-slider" id="sl_${co.id}"
-        min="0" max="100" step="1" value="${S.alloc[co.id]}" />
+        min="0" max="100" step="5" value="${S.alloc[co.id]}" />
     </div>`).join("");
 
   document.getElementById("gContent").innerHTML = `
@@ -302,7 +302,7 @@ function waitForRealGame() {
     if (state.openYear >= 1) {
       clearInterval(S._poll);
       S.totalValue = STARTING_CASH;
-      S.alloc      = { nova: 34, prime: 33, fast: 33 };
+      S.alloc      = { nova: 35, prime: 35, fast: 30 };
       S.prevAlloc  = null;
       S.history    = [];
       S.yearIndex  = state.openYear;
@@ -338,12 +338,17 @@ function waitForNextYear() {
     const nextIdx = currentYearIdx + 1;
     if (state.openYear >= nextIdx) {
       clearInterval(S._poll);
-      S.totalValue = calcNewValue(S.totalValue, S.alloc, currentYearIdx, nextIdx);
-      S.yearIndex  = nextIdx;
-      S.done       = false;
+      // Calculate returns for ALL years that passed (in case admin skipped ahead)
+      let fromIdx = currentYearIdx;
+      const toIdx = Math.min(state.openYear, 5);
+      // Apply returns year by year
+      for (let y = fromIdx; y < toIdx; y++) {
+        S.totalValue = calcNewValue(S.totalValue, S.alloc, y, y + 1);
+      }
+      S.yearIndex = toIdx;
+      S.done      = false;
       document.getElementById("gBal").textContent = fmt(S.totalValue);
-      // If admin already ended the game, go straight to results
-      if (S.yearIndex > 5 || state.gamePhase === "end") { showResults(); return; }
+      if (S.yearIndex >= 5 || state.gamePhase === "end") { applyFinalReturns(); showResults(); return; }
       showAllocScreen();
     }
   }, 2500);
